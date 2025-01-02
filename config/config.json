@@ -1,0 +1,24 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "123123",
+    "database": "postgres",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres1",
+    "password": "Wy4BRbWiIenBHYIr3K6Pt7fxy5Z7QvQN",
+    "database": "postgres1_m4gb_l7dk",
+    "host": "dpg-cs6fs9bqf0us73ecacm0-a.oregon-postgres.render.com",
+    "dialect": "postgres",
+    "port": 5432,
+    "ssl": true,
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  }
+}
