@@ -1,17 +1,13 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Post } from './posts.model';
-import { CreatePostDto } from './dto/create.dto';
-import { UpdatePostDto } from './dto/update.dto';
 import { FileUploader } from 'src/middlewares/FileUploader';
-import { User } from 'src/modules/users/users.model';
 import { Community } from 'src/modules/communities/entities/Community';
+import { User } from 'src/modules/users/users.model';
 import { Comment } from '../comments/entities/Comment';
 import { Reaction } from '../comments/entities/Reaction';
+import { CreatePostDto } from './dto/create.dto';
+import { UpdatePostDto } from './dto/update.dto';
+import { Post } from './posts.model';
 
 @Injectable()
 export class PostsService {
@@ -28,9 +24,7 @@ export class PostsService {
     const communityExists = await Community.findByPk(createPostDto.communityId);
     if (!communityExists) throw new NotFoundException('Community not found');
 
-    const uploadedFiles = await this.fileUploader.uploadFiles(
-      createPostDto.files,
-    );
+    const uploadedFiles = await this.fileUploader.uploadFiles(createPostDto.files);
 
     const post = await this.postModel.create({
       ...createPostDto,
@@ -38,9 +32,7 @@ export class PostsService {
     });
 
     return this.postModel.findByPk(post.id, {
-      include: [
-        { model: User, attributes: ['username', 'photo'], as: 'sender' },
-      ],
+      include: [{ model: User, attributes: ['username', 'photo'], as: 'sender' }],
     });
   }
 
@@ -124,7 +116,15 @@ export class PostsService {
       fields: ['text', 'files', 'communityId', 'creatorId'],
     });
 
-    return post.reload();
+    return post.reload({
+      include: [
+        {
+          model: User,
+          as: 'sender',
+          attributes: ['id', 'username', 'photo'],
+        },
+      ],
+    });
   }
 
   async remove(id: number): Promise<Post> {
@@ -159,7 +159,7 @@ export class PostsService {
       throw new BadRequestException('User has not liked this post');
     }
 
-    post.likes = post.likes.filter((id) => id !== userId);
+    post.likes = post.likes.filter(id => id !== userId);
     await post.update({ likes: post.likes });
 
     return post;
