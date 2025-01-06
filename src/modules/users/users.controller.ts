@@ -1,16 +1,18 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
-  Delete,
-  Patch,
-  NotFoundException,
   ConflictException,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
+import { CreateUserDto } from './dto/create.dto';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create';
 
 @Controller('users')
 export class UsersController {
@@ -22,7 +24,7 @@ export class UsersController {
       return await this.usersService.create(createUserDto);
     } catch (error) {
       if (error instanceof ConflictException) {
-        throw new ConflictException('Username already exists');
+        throw new ConflictException('User already exists');
       }
 
       throw error;
@@ -47,36 +49,24 @@ export class UsersController {
     }
   }
 
+  @Get('email/:email')
+  async findByEmail(@Param('email') email: string) {
+    return await this.usersService.findByEmail(email);
+  }
+
   @Get('firebase/:firebaseId')
   async findByFirebaseId(@Param('firebaseId') firebaseId: string) {
-    try {
-      return await this.usersService.findByFirebaseId(firebaseId);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException('User not found');
-      }
-
-      throw error;
-    }
+    return await this.usersService.findByFirebaseId(firebaseId);
   }
 
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateUserDto: Partial<CreateUserDto>,
-  ) {
+  async update(@Param('id') id: string, @Body() updateUserDto: Partial<CreateUserDto>) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    try {
-      return this.usersService.remove(id);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException('User not found');
-      }
-      throw error;
-    }
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id') id: string): Promise<{ message: string }> {
+    return this.usersService.remove(id);
   }
 }

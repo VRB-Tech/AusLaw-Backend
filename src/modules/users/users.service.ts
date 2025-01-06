@@ -1,12 +1,8 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from './users.model';
-import { CreateUserDto } from './dto/create';
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/create.dto';
+import { User } from './users.model';
 
 @Injectable()
 export class UsersService {
@@ -18,12 +14,12 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const existingUser = await this.userModel.findOne({
       where: {
-        username: createUserDto.username,
+        email: createUserDto.email,
       },
     });
 
     if (existingUser) {
-      throw new ConflictException('Username already exists');
+      throw new ConflictException('User already exists');
     }
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
@@ -46,25 +42,34 @@ export class UsersService {
     return user;
   }
 
-  async findByUsername(username: string): Promise<User | null> {
-    return this.userModel.findOne({ where: { username } });
+  async findByEmail(email: string): Promise<User> {
+    return this.userModel.findOne({ where: { email } });
   }
 
-  async findByFirebaseId(firebaseId: string): Promise<User | null> {
-    return this.userModel.findOne({ where: { firebaseId } });
+  async findByFirebaseId(firebaseId: string): Promise<User> {
+    const user = await this.userModel.findOne({ where: { firebaseId } });
+
+    if (!user) {
+      throw new NotFoundException(`User with firebaseId: '${firebaseId}' not found`);
+    }
+
+    return user;
   }
 
-  async update(
-    id: string,
-    updateUserDto: Partial<CreateUserDto>,
-  ): Promise<User> {
+  async update(id: string, updateUserDto: Partial<CreateUserDto>): Promise<User> {
     const user = await this.findOne(id);
 
     return user.update(updateUserDto);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string): Promise<{ message: string }> {
     const user = await this.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with ID: '${id}' not found`);
+    }
+
     await user.destroy();
+    return { message: `User with ID ${id} was removed successfully.` };
   }
 }

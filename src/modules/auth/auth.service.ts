@@ -1,12 +1,11 @@
-import {
-  Injectable,
-  ConflictException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { UsersService } from '../users/users.service';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../users/users.model';
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from '../users/dto/create.dto';
+import { UserResponseDto } from '../users/dto/userResponse.dto';
+import { UsersService } from '../users/users.service';
+import { LoginDto } from './dto/auth-dto';
+import { JwtPayload } from './jwt/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -15,41 +14,52 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(username: string, password: string): Promise<User> {
-    const existingUser = await this.usersService.findByUsername(username);
+  async register(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+    const { email, firstName, lastName, password } = createUserDto;
+    const existingUser = await this.usersService.findByEmail(email);
 
     if (existingUser) {
       throw new ConflictException('User already exists');
     }
 
     const newUser = await this.usersService.create({
-      username,
+      firstName,
+      lastName,
+      email,
       password,
       role: 'user',
     });
 
-    return newUser;
+    return {
+      id: newUser.id,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+    };
   }
 
-  async login(
-    username: string,
-    password: string,
-  ): Promise<{ access_token: string; user: User }> {
-    const user = await this.usersService.findByUsername(username);
+  async login(loginDto: LoginDto): Promise<{ accessToken: string; user: UserResponseDto }> {
+    const { email, password } = loginDto;
+    const user = await this.usersService.findByEmail(email);
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = {
-      username: user.username,
-      sub: user.id,
-      role: user.status,
+    const payload: JwtPayload = {
+      email: user.email,
+      subject: user.id,
+      role: user.role,
     };
 
     return {
-      access_token: this.jwtService.sign(payload),
-      user,
+      accessToken: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
     };
   }
 }

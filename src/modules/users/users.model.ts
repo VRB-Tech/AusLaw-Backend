@@ -1,20 +1,20 @@
 import {
-  Table,
+  AutoIncrement,
+  BelongsToMany,
   Column,
+  DataType,
+  HasMany,
   Model,
   PrimaryKey,
-  AutoIncrement,
-  HasMany,
-  BelongsToMany,
-  DataType,
+  Table,
 } from 'sequelize-typescript';
-import { Chat } from '../chats/chats.model';
 import { ChatUser } from 'src/modules/chats/entities/ChatUser.model';
 import { UserRole } from 'src/types/UserRole';
-import { Community } from '../communities/entities/Community';
-import { CommunityUser } from '../communities/entities/CommunityUser';
+import { Chat } from '../chats/chats.model';
 import { Reaction } from '../comments/entities/Reaction';
 import { ReactionUser } from '../comments/entities/ReactionUser';
+import { Community } from '../communities/entities/Community';
+import { CommunityUser } from '../communities/entities/CommunityUser';
 
 @Table
 export class User extends Model<User> {
@@ -23,13 +23,51 @@ export class User extends Model<User> {
   @Column(DataType.INTEGER)
   id: number;
 
-  @Column(DataType.STRING)
-  username: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
+  })
+  firstName: string;
 
-  @Column(DataType.STRING)
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
+  })
+  lastName: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true,
+    validate: {
+      notEmpty: true,
+      isEmail: true,
+    },
+  })
+  email: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+      len: [8, 100],
+    },
+  })
   password: string;
 
-  @Column(DataType.STRING)
+  @Column({
+    type: DataType.STRING,
+    validate: {
+      isUrl: true,
+    },
+  })
   photo: string;
 
   @Column(DataType.STRING)
@@ -76,9 +114,6 @@ export class User extends Model<User> {
 
   @Column(DataType.FLOAT)
   dailyRate: number;
-
-  @Column(DataType.STRING)
-  email: string;
 
   @Column(DataType.STRING)
   mobile: string;
