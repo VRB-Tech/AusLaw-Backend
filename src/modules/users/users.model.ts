@@ -74,6 +74,9 @@ export class User extends Model<User> {
   firebaseId: string;
 
   @Column(DataType.STRING)
+  refreshToken?: string;
+
+  @Column(DataType.STRING)
   grantId: string;
 
   @Column(DataType.STRING)

@@ -38,7 +38,9 @@ export class AuthService {
     };
   }
 
-  async login(loginDto: LoginDto): Promise<{ accessToken: string; user: UserResponseDto }> {
+  async login(
+    loginDto: LoginDto,
+  ): Promise<{ accessToken: string; refreshToken: string; user: UserResponseDto }> {
     const { email, password } = loginDto;
     const user = await this.usersService.findByEmail(email);
 
@@ -52,8 +54,14 @@ export class AuthService {
       role: user.role,
     };
 
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '60m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    await this.usersService.updateRefreshToken(user.id, refreshToken);
+
     return {
-      accessToken: this.jwtService.sign(payload),
+      accessToken,
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -61,5 +69,41 @@ export class AuthService {
         lastName: user.lastName,
       },
     };
+  }
+
+  async refreshTokens(
+    refreshToken: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    try {
+      const decoded = this.jwtService.verify(refreshToken);
+
+      const user = await this.usersService.findById(decoded.subject);
+
+      if (!user.refreshToken || !(await bcrypt.compare(refreshToken, user.refreshToken))) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const payload: JwtPayload = {
+        email: user.email,
+        subject: user.id,
+        role: user.role,
+      };
+
+      const newAccessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+      const newRefreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+      await this.usersService.updateRefreshToken(user.id, newRefreshToken);
+
+      return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      };
+    } catch (err) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  async logout(userId: number): Promise<void> {
+    await this.usersService.updateRefreshToken(userId, null);
   }
 }

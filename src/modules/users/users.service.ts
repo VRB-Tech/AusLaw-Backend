@@ -35,6 +35,10 @@ export class UsersService {
     return this.userModel.findAll();
   }
 
+  async findById(userId: number): Promise<User | null> {
+    return this.userModel.findOne({ where: { id: userId } });
+  }
+
   async findOne(id: string): Promise<User> {
     const user = await this.userModel.findByPk(id);
     if (!user) throw new NotFoundException('User not found');
@@ -59,6 +63,10 @@ export class UsersService {
   async update(id: string, updateUserDto: Partial<CreateUserDto>): Promise<User> {
     const user = await this.findOne(id);
 
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+
     return user.update(updateUserDto);
   }
 
@@ -71,5 +79,10 @@ export class UsersService {
 
     await user.destroy();
     return { message: `User with ID ${id} was removed successfully.` };
+  }
+
+  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
+    const hashedToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
+    await this.userModel.update({ refreshToken: hashedToken }, { where: { id: userId } });
   }
 }
