@@ -1,28 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { CloudinaryConfig } from 'uploads/cloudinary.config';
 import * as sharp from 'sharp';
+import { CloudinaryConfig } from 'src/uploads/cloudinary.config';
 
 @Injectable()
 export class FileUploader {
   constructor(private readonly cloudinaryConfig: CloudinaryConfig) {}
 
-  async uploadFiles(
-    files: Express.Multer.File[] | string[],
-  ): Promise<string[]> {
+  async uploadFiles(files: Express.Multer.File[] | string[]): Promise<string[]> {
     let uploadedFiles: string[] = [];
 
-    if (Array.isArray(files) && files.every((file) => file instanceof Object)) {
+    if (Array.isArray(files) && files.every(file => file instanceof Object)) {
       uploadedFiles = await Promise.all(
-        files.map((file) =>
-          this.processAndUploadFile(file.buffer, file.mimetype),
-        ),
+        files.map(file => this.processAndUploadFile(file.buffer, file.mimetype)),
       );
-    } else if (
-      Array.isArray(files) &&
-      files.every((file) => typeof file === 'string')
-    ) {
+    } else if (Array.isArray(files) && files.every(file => typeof file === 'string')) {
       uploadedFiles = await Promise.all(
-        files.map(async (base64Data) => {
+        files.map(async base64Data => {
           const data = base64Data.split(',')[1];
           const format = base64Data.split(';')[0].split('/')[1];
           const buffer = Buffer.from(data, 'base64');
@@ -35,20 +28,12 @@ export class FileUploader {
     return uploadedFiles;
   }
 
-  private async processAndUploadFile(
-    buffer: Buffer,
-    format: string,
-  ): Promise<string> {
+  private async processAndUploadFile(buffer: Buffer, format: string): Promise<string> {
     let processedBuffer;
 
-    const isImage = [
-      'image/jpeg',
-      'jpeg',
-      'image/webp',
-      'webp',
-      'image/png',
-      'png',
-    ].includes(format.toLowerCase());
+    const isImage = ['image/jpeg', 'jpeg', 'image/webp', 'webp', 'image/png', 'png'].includes(
+      format.toLowerCase(),
+    );
 
     switch (format) {
       case 'image/jpeg':
@@ -66,9 +51,7 @@ export class FileUploader {
 
       case 'image/png':
       case 'png':
-        processedBuffer = await sharp(buffer)
-          .png({ compressionLevel: 8 })
-          .toBuffer();
+        processedBuffer = await sharp(buffer).png({ compressionLevel: 8 }).toBuffer();
 
         break;
 

@@ -1,21 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
-  Patch,
+  Get,
   HttpCode,
-  UseInterceptors,
+  Param,
+  Patch,
+  Post,
   UploadedFiles,
-  HttpException,
-  HttpStatus,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ChatsService } from './chats.service';
-import { CreateChatDto } from './dto/create';
-import { UpdateChatDto } from './dto/update';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { ChatsService } from './chats.service';
+import { CreateChatDto } from './dto/create.dto';
+import { UpdateChatDto } from './dto/update.dto';
 
 @Controller('chats')
 export class ChatsController {
@@ -23,10 +21,7 @@ export class ChatsController {
 
   @Post()
   @UseInterceptors(FilesInterceptor('avatar', 1))
-  async create(
-    @Body() createChatDto: CreateChatDto,
-    @UploadedFiles() avatar: Express.Multer.File,
-  ) {
+  async create(@Body() createChatDto: CreateChatDto, @UploadedFiles() avatar: Express.Multer.File) {
     createChatDto.avatar = avatar;
 
     return this.chatsService.create(createChatDto);

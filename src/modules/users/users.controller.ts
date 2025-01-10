@@ -54,11 +54,6 @@ export class UsersController {
     return await this.usersService.findByEmail(email);
   }
 
-  @Get('firebase/:firebaseId')
-  async findByFirebaseId(@Param('firebaseId') firebaseId: string) {
-    return await this.usersService.findByFirebaseId(firebaseId);
-  }
-
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: Partial<CreateUserDto>) {
     return this.usersService.update(id, updateUserDto);

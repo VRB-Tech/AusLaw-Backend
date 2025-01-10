@@ -7,18 +7,18 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { MessagesService } from 'src/modules/messages/messages.service';
 import { ChatsService } from 'src/modules/chats/chats.service';
-import { CreateChatDto } from 'src/modules/chats/dto/create';
-import { UpdateChatDto } from 'src/modules/chats/dto/update';
-import { UpdateMessageDto } from 'src/modules/messages/dto/update';
+import { CreateChatDto } from 'src/modules/chats/dto/create.dto';
+import { UpdateChatDto } from 'src/modules/chats/dto/update.dto';
+import { CreateCommentDto } from 'src/modules/comments/dto/create.dto';
+import { CreateReactionDto } from 'src/modules/comments/dto/createReaction.dto';
+import { UpdateCommentDto } from 'src/modules/comments/dto/update.dto';
+import { CommentsService } from 'src/modules/comments/services/comments.service';
+import { ReactionsService } from 'src/modules/comments/services/reactions.service';
+import { UpdateMessageDto } from 'src/modules/messages/dto/update.dto';
+import { MessagesService } from 'src/modules/messages/messages.service';
 import { CreatePostDto } from 'src/modules/posts/dto/create.dto';
 import { PostsService } from 'src/modules/posts/posts.service';
-import { CommentsService } from 'src/modules/comments/services/comments.service';
-import { UpdateCommentDto } from 'src/modules/comments/dto/update.dto';
-import { CreateCommentDto } from 'src/modules/comments/dto/create.dto';
-import { ReactionsService } from 'src/modules/comments/services/reactions.service';
-import { CreateReactionDto } from 'src/modules/comments/dto/createReaction.dto';
 
 @WebSocketGateway({
   cors: {
@@ -130,10 +130,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const { messageId, updateMessageDto } = payload;
 
-    const updatedMessage = await this.messagesService.update(
-      messageId,
-      updateMessageDto,
-    );
+    const updatedMessage = await this.messagesService.update(messageId, updateMessageDto);
 
     this.server.emit('messageEdited', updatedMessage);
   }
@@ -218,10 +215,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('likePost')
-  async handleLikePost(
-    client: Socket,
-    payload: { postId: number; userId: number },
-  ) {
+  async handleLikePost(client: Socket, payload: { postId: number; userId: number }) {
     const { postId, userId } = payload;
 
     const likedPost = await this.postsService.likePost(postId, userId);
@@ -229,10 +223,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('unlikePost')
-  async handleUnlikePost(
-    client: Socket,
-    payload: { postId: number; userId: number },
-  ) {
+  async handleUnlikePost(client: Socket, payload: { postId: number; userId: number }) {
     const { postId, userId } = payload;
 
     const unlikedPost = await this.postsService.unlikePost(postId, userId);
@@ -265,10 +256,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const { commentId, updateCommentDto } = payload;
 
-    const updatedComment = await this.commentsService.update(
-      commentId,
-      updateCommentDto,
-    );
+    const updatedComment = await this.commentsService.update(commentId, updateCommentDto);
 
     this.server.emit('commentEdited', updatedComment);
   }
@@ -294,11 +282,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { commentId, userId, emoji } = payload;
 
     try {
-      const reaction = await this.reactionsService.addReaction(
-        commentId,
-        userId,
-        emoji,
-      );
+      const reaction = await this.reactionsService.addReaction(commentId, userId, emoji);
 
       this.server.emit('reactionAdded', reaction);
     } catch (error) {
@@ -314,11 +298,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { commentId, userId, emoji } = payload;
 
     try {
-      const reaction = await this.reactionsService.removeReaction(
-        commentId,
-        userId,
-        emoji,
-      );
+      const reaction = await this.reactionsService.removeReaction(commentId, userId, emoji);
 
       this.server.emit('reactionRemoved', reaction);
     } catch (error) {

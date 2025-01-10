@@ -17,6 +17,7 @@ import { Invitation } from './modules/communities/entities/Invitations';
 import { MessageStatus } from './modules/messages/entities/MessageStatus.model';
 import { Message } from './modules/messages/messages.model';
 import { MessagesModule } from './modules/messages/messages.module';
+import { OrganisationsModule } from './modules/organisations/organisations.module';
 import { Post } from './modules/posts/posts.model';
 import { PostsModule } from './modules/posts/posts.module';
 import { User } from './modules/users/users.model';
@@ -82,6 +83,7 @@ import { NylasModule } from './nylas/nylas.module';
     CommentsModule,
     NylasModule,
     WebSocketModule,
+    OrganisationsModule,
   ],
 })
 export class AppModule {}

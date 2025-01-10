@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateMessageDto } from './dto/create';
-import { UpdateMessageDto } from './dto/update';
-import { Message } from './messages.model';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from 'src/modules/users/users.model';
-import { MessageStatusType } from 'src/types/MessageStatus';
-import { MessageStatus } from './entities/MessageStatus.model';
+import { Op } from 'sequelize';
 import { FileUploader } from 'src/middlewares/FileUploader';
 import { ChatsService } from 'src/modules/chats/chats.service';
-import { Op } from 'sequelize';
+import { User } from 'src/modules/users/users.model';
+import { MessageStatusType } from 'src/types/MessageStatus';
+import { CreateMessageDto } from './dto/create.dto';
+import { UpdateMessageDto } from './dto/update.dto';
+import { MessageStatus } from './entities/MessageStatus.model';
+import { Message } from './messages.model';
 
 @Injectable()
 export class MessagesService {
@@ -22,21 +22,17 @@ export class MessagesService {
   ) {}
 
   async create(createMessageDto: CreateMessageDto) {
-    const uploadedFiles = await this.fileUploader.uploadFiles(
-      createMessageDto.files,
-    );
+    const uploadedFiles = await this.fileUploader.uploadFiles(createMessageDto.files);
 
     const message = await this.messageModel.create({
       ...createMessageDto,
       files: uploadedFiles,
     });
 
-    const participants = await this.chatsService.getChatParticipants(
-      createMessageDto.chatId,
-    );
+    const participants = await this.chatsService.getChatParticipants(createMessageDto.chatId);
 
     await Promise.all(
-      participants.map(async (userId) => {
+      participants.map(async userId => {
         await this.messageStatusModel.create({
           userId,
           chatId: createMessageDto.chatId,
@@ -77,10 +73,7 @@ export class MessagesService {
     });
   }
 
-  async update(
-    id: number,
-    updateMessageDto: UpdateMessageDto,
-  ): Promise<Message> {
+  async update(id: number, updateMessageDto: UpdateMessageDto): Promise<Message> {
     const message = await this.findOne(id);
 
     if (!message) {
@@ -94,11 +87,7 @@ export class MessagesService {
     return message.reload();
   }
 
-  async updateMessageStatus(
-    messageId: number,
-    userId: number,
-    status: MessageStatusType,
-  ) {
+  async updateMessageStatus(messageId: number, userId: number, status: MessageStatusType) {
     const messageStatus = await this.messageStatusModel.findOne({
       where: { messageId, userId },
     });
@@ -112,19 +101,13 @@ export class MessagesService {
     } else if (status === 'read') {
       await messageStatus.update({ isRead: true, readAt: new Date() });
 
-      await this.messageModel.update(
-        { status: 'read' },
-        { where: { id: messageId } },
-      );
+      await this.messageModel.update({ status: 'read' }, { where: { id: messageId } });
     }
 
     return messageStatus.reload();
   }
 
-  async checkIfSomeRead(
-    messageId: number,
-    participants: number[],
-  ): Promise<boolean> {
+  async checkIfSomeRead(messageId: number, participants: number[]): Promise<boolean> {
     const readCount = await this.messageStatusModel.count({
       where: { messageId, userId: { [Op.in]: participants }, isRead: true },
     });

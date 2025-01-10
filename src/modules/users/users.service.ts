@@ -50,16 +50,6 @@ export class UsersService {
     return this.userModel.findOne({ where: { email } });
   }
 
-  async findByFirebaseId(firebaseId: string): Promise<User> {
-    const user = await this.userModel.findOne({ where: { firebaseId } });
-
-    if (!user) {
-      throw new NotFoundException(`User with firebaseId: '${firebaseId}' not found`);
-    }
-
-    return user;
-  }
-
   async update(id: string, updateUserDto: Partial<CreateUserDto>): Promise<User> {
     const user = await this.findOne(id);
 
@@ -84,5 +74,10 @@ export class UsersService {
   async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
     const hashedToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
     await this.userModel.update({ refreshToken: hashedToken }, { where: { id: userId } });
+  }
+
+  async updatePassword(userId: number, newPassword: string): Promise<void> {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.userModel.update({ password: hashedPassword }, { where: { id: userId } });
   }
 }

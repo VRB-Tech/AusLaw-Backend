@@ -1,21 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
   Patch,
-  UseInterceptors,
+  Post,
   UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { MessagesService } from './messages.service';
-import { CreateMessageDto } from './dto/create';
-import { UpdateMessageDto } from './dto/update';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { MessageStatusType } from 'src/types/MessageStatus';
+import { CreateMessageDto } from './dto/create.dto';
+import { UpdateMessageDto } from './dto/update.dto';
+import { MessagesService } from './messages.service';
 
 @Controller('messages')
 export class MessagesController {
@@ -48,10 +46,7 @@ export class MessagesController {
   }
 
   @Patch(':id')
-  async update(
-    @Param('id') id: number,
-    @Body() updateMessageDto: UpdateMessageDto,
-  ) {
+  async update(@Param('id') id: number, @Body() updateMessageDto: UpdateMessageDto) {
     return await this.messagesService.update(id, updateMessageDto);
   }
 
@@ -61,11 +56,7 @@ export class MessagesController {
     @Param('userId') userId: number,
     @Body('status') status: MessageStatusType,
   ) {
-    return await this.messagesService.updateMessageStatus(
-      messageId,
-      userId,
-      status,
-    );
+    return await this.messagesService.updateMessageStatus(messageId, userId, status);
   }
 
   @Delete(':id')

@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Chat } from './chats.model';
-import { CreateChatDto } from './dto/create';
-import { UpdateChatDto } from './dto/update';
 import { Op } from 'sequelize';
-import { Message } from '../messages/messages.model';
 import { FileUploader } from 'src/middlewares/FileUploader';
+import { Message } from '../messages/messages.model';
 import { User } from '../users/users.model';
+import { Chat } from './chats.model';
+import { CreateChatDto } from './dto/create.dto';
+import { UpdateChatDto } from './dto/update.dto';
 
 @Injectable()
 export class ChatsService {
@@ -29,8 +29,7 @@ export class ChatsService {
         : [createChatDto.avatar];
 
       const validFilesToUpload = filesToUpload.filter(
-        (file) =>
-          typeof file === 'string' || (file as Express.Multer.File).buffer,
+        file => typeof file === 'string' || (file as Express.Multer.File).buffer,
       );
 
       uploadedFiles = await this.fileUploader.uploadFiles(validFilesToUpload);
@@ -51,7 +50,7 @@ export class ChatsService {
 
     await chat.$set(
       'usersInfo',
-      existingUsers.map((user) => user.id),
+      existingUsers.map(user => user.id),
     );
 
     const chatWithUsers = await this.chatModel.findByPk(chat.id, {
@@ -73,7 +72,7 @@ export class ChatsService {
       throw new NotFoundException('Chat not found');
     }
 
-    return chat.users.map((id) => Number(id));
+    return chat.users.map(id => Number(id));
   }
 
   async findAll(): Promise<Chat[]> {

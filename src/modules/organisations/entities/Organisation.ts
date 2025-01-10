@@ -1,0 +1,50 @@
+import {
+  AutoIncrement,
+  Column,
+  DataType,
+  Default,
+  Model,
+  PrimaryKey,
+  Table,
+  Unique,
+} from 'sequelize-typescript';
+
+@Table
+export class Organisation extends Model<Organisation> {
+  @PrimaryKey
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  id: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  name: string;
+
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+  })
+  isDoyles: boolean;
+
+  @Unique
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    validate: {
+      isEmail: true,
+    },
+  })
+  email: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  password: string;
+
+  @Column(DataType.STRING)
+  refreshToken?: string;
+}
