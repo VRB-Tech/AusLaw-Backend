@@ -14,7 +14,7 @@ import { UserResponseDto } from '../users/dto/userResponse.dto';
 import { User } from '../users/users.model';
 import { UsersService } from '../users/users.service';
 import { loginDto } from './dto/login.dto';
-import { authDto } from './dto/register.dto';
+import { OrganisationRegisterDto, UserRegisterDto } from './dto/register.dto';
 import { JwtPayload } from './jwt/jwt-payload.interface';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class AuthService {
     private readonly mailerService: MailerService,
   ) {}
 
-  async registerUser(authDto: authDto): Promise<UserResponseDto> {
+  async registerUser(authDto: UserRegisterDto): Promise<UserResponseDto> {
     const { isDoyles, firstName, lastName, email, password } = authDto;
     const existingUser = await this.usersService.findByEmail(email);
 
@@ -51,7 +51,7 @@ export class AuthService {
     };
   }
 
-  async registerOrganisation(authDto: authDto): Promise<OrganisationResponseDto> {
+  async registerOrganisation(authDto: OrganisationRegisterDto): Promise<OrganisationResponseDto> {
     const { email, name, password, isDoyles } = authDto;
 
     const existingOrganisation = await this.organisationsService.findByEmail(email);
@@ -263,5 +263,34 @@ export class AuthService {
 
   async logoutOrganisation(organisationId: number): Promise<void> {
     await this.organisationsService.updateRefreshToken(organisationId, null);
+  }
+
+  async registerUserByGoogle(profile: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    picture: string;
+    accessToken: string;
+  }): Promise<UserResponseDto> {
+    const existingUser = await this.usersService.findByEmail(profile.email);
+
+    if (existingUser) {
+      throw new ConflictException('User already exists');
+    }
+
+    const newUser = await this.usersService.create({
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      email: profile.email,
+      password: 'oauth',
+      isDoyles: false,
+    });
+
+    return {
+      id: newUser.id,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+    };
   }
 }

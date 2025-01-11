@@ -6,6 +6,7 @@ import { OrganisationsModule } from '../organisations/organisations.module';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { GoogleStrategy } from './google/google.strategy';
 import { JwtStrategy } from './jwt/jwt.strategy';
 
 @Module({
@@ -17,13 +18,12 @@ import { JwtStrategy } from './jwt/jwt.strategy';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '7d' },
       }),
       inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, MailerService],
+  providers: [AuthService, JwtStrategy, MailerService, GoogleStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

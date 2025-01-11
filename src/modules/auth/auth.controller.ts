@@ -2,33 +2,70 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Query,
+  Req,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { loginDto } from './dto/login.dto';
-import { authDto } from './dto/register.dto';
+import { OrganisationRegisterDto, UserRegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+  ) {}
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {}
 
-  @Post('register')
-  @HttpCode(HttpStatus.CREATED)
-  async register(@Body() registerAccountDto: authDto) {
-    const type = registerAccountDto.name ? 'organisation' : 'user';
-    const response =
-      type === 'organisation'
-        ? await this.authService.registerOrganisation(registerAccountDto)
-        : await this.authService.registerUser(registerAccountDto);
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req) {
+    const user = req.user;
+
+    const payload = { email: user.email, subject: user.id };
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '14d' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '30d' });
 
     return {
-      message: `${type === 'user' ? 'User' : 'Organisation'} registered successfully`,
-      account: response,
+      accessToken,
+      refreshToken,
+      user,
+    };
+  }
+
+  @Post('register/user')
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  async registerUser(@Body() userRegisterDto: UserRegisterDto) {
+    const user = await this.authService.registerUser(userRegisterDto);
+
+    return {
+      message: 'User registered successfully',
+      account: user,
+    };
+  }
+
+  @Post('register/organisation')
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  async registerOrganisation(@Body() organisationRegisterDto: OrganisationRegisterDto) {
+    const organisation = await this.authService.registerOrganisation(organisationRegisterDto);
+
+    return {
+      message: 'Organisation registered successfully',
+      account: organisation,
     };
   }
 
