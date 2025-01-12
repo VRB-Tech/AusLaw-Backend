@@ -17,7 +17,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { loginDto } from './dto/login.dto';
 import { OrganisationRegisterDto, UserRegisterDto } from './dto/register.dto';
-import { JwtAuthGuard } from './jwt/jwt-auth.guard';
+import { JwtAuthGuard } from './strategies/jwt/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {

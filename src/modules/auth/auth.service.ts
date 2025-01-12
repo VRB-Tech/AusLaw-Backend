@@ -15,7 +15,7 @@ import { User } from '../users/users.model';
 import { UsersService } from '../users/users.service';
 import { loginDto } from './dto/login.dto';
 import { OrganisationRegisterDto, UserRegisterDto } from './dto/register.dto';
-import { JwtPayload } from './jwt/jwt-payload.interface';
+import { JwtPayload } from './strategies/jwt/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {

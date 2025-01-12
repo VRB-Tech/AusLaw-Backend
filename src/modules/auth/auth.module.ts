@@ -6,8 +6,8 @@ import { OrganisationsModule } from '../organisations/organisations.module';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { GoogleStrategy } from './google/google.strategy';
-import { JwtStrategy } from './jwt/jwt.strategy';
+import { GoogleStrategy } from './strategies/google/google.strategy';
+import { JwtStrategy } from './strategies/jwt/jwt.strategy';
 
 @Module({
   imports: [
