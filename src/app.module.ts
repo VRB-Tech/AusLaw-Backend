@@ -53,12 +53,12 @@ import { NylasModule } from './nylas/nylas.module';
           Comment,
           Post,
         ],
-        dialectOptions: {
-          ssl: {
-            require: true,
-            rejectUnauthorized: true,
-          },
-        },
+        // dialectOptions: {
+        //   ssl: {
+        //     require: true,
+        //     rejectUnauthorized: true,
+        //   },
+        // },
         autoLoadModels: true,
         synchronize: true,
       }),

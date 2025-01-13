@@ -219,7 +219,7 @@ export class AuthService {
       { expiresIn: '1h' },
     );
 
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+    const resetLink = `https://auslaw-backend-dev.onrender.com/reset-password?token=${resetToken}`;
 
     await this.mailerService.sendMail({
       to: email,
