@@ -38,8 +38,10 @@ export class OrganisationsService {
     await this.organisationModel.update({ refreshToken: hashedRefreshToken }, { where: { id } });
   }
 
-  async updatePassword(orgId: number, newPassword: string): Promise<void> {
+  async updatePassword(orgId: number, newPassword: string): Promise<string> {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await this.organisationModel.update({ password: hashedPassword }, { where: { id: orgId } });
+
+    return hashedPassword;
   }
 }

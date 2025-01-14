@@ -111,6 +111,7 @@ export class AuthController {
     @Body() { email, type }: { email: string; type: 'user' | 'organisation' },
   ) {
     await this.authService.requestPasswordReset(email, type);
+
     return { message: 'Password reset link sent successfully' };
   }
 

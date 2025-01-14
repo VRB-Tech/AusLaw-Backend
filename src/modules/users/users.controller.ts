@@ -10,8 +10,10 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create.dto';
+import { User } from './users.model';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -49,11 +51,6 @@ export class UsersController {
     }
   }
 
-  @Get('email/:email')
-  async findByEmail(@Param('email') email: string) {
-    return await this.usersService.findByEmail(email);
-  }
-
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: Partial<CreateUserDto>) {
     return this.usersService.update(id, updateUserDto);
@@ -63,5 +60,20 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string): Promise<{ message: string }> {
     return this.usersService.remove(id);
+  }
+
+  @Get('search')
+  async findByQuery(
+    @Query()
+    filters: {
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      state?: string;
+      services?: string;
+      dailyRate?: number;
+    },
+  ): Promise<User[]> {
+    return this.usersService.getUsersByQuery(filters);
   }
 }

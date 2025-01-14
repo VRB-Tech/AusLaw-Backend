@@ -1,6 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
+import { Op, WhereOptions } from 'sequelize';
 import { CreateUserDto } from './dto/create.dto';
 import { User } from './users.model';
 
@@ -41,7 +42,10 @@ export class UsersService {
 
   async findOne(id: string): Promise<User> {
     const user = await this.userModel.findByPk(id);
-    if (!user) throw new NotFoundException('User not found');
+
+    if (!user) {
+      throw new NotFoundException(`User with ID: '${id}' not found`);
+    }
 
     return user;
   }
@@ -54,7 +58,7 @@ export class UsersService {
     const user = await this.findOne(id);
 
     if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+      updateUserDto.password = await this.updatePassword(user.id, updateUserDto.password);
     }
 
     return user.update(updateUserDto);
@@ -71,13 +75,47 @@ export class UsersService {
     return { message: `User with ID ${id} was removed successfully.` };
   }
 
-  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
+  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<string> {
     const hashedToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
     await this.userModel.update({ refreshToken: hashedToken }, { where: { id: userId } });
+
+    return refreshToken;
   }
 
-  async updatePassword(userId: number, newPassword: string): Promise<void> {
+  async updatePassword(userId: number, newPassword: string): Promise<string> {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await this.userModel.update({ password: hashedPassword }, { where: { id: userId } });
+
+    return hashedPassword;
+  }
+
+  async getUsersByQuery(filters: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    state?: string;
+    services?: string;
+    dailyRate?: number;
+  }): Promise<User[]> {
+    const whereClause: WhereOptions = {};
+
+    const filterMappings = {
+      firstName: (value: string) => ({ [Op.like]: `%${value}%` }),
+      lastName: (value: string) => ({ [Op.like]: `%${value}%` }),
+      email: (value: string) => ({ [Op.like]: `%${value}%` }),
+      state: (value: string) => ({ [Op.like]: `%${value}%` }),
+      services: (value: string) => ({ [Op.contains]: [value] }),
+      dailyRate: (value: number) => ({ [Op.eq]: value }),
+    };
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value && filterMappings[key]) {
+        whereClause[key] = filterMappings[key](value);
+      }
+    });
+
+    return this.userModel.findAll({
+      where: whereClause,
+    });
   }
 }

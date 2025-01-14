@@ -79,16 +79,10 @@ export class User extends Model<User> {
   photo: string;
 
   @Column(DataType.STRING)
-  firebaseId: string;
-
-  @Column(DataType.STRING)
   refreshToken?: string;
 
   @Column(DataType.STRING)
   grantId: string;
-
-  @Column(DataType.STRING)
-  calendarEmail: string;
 
   @Column(DataType.STRING)
   provider: string;
@@ -111,44 +105,17 @@ export class User extends Model<User> {
   })
   role: UserRole;
 
-  @Column(DataType.STRING)
-  streetAddress: string;
-
-  @Column(DataType.STRING)
-  accreditations: string;
-
-  @Column(DataType.STRING)
-  address: string;
-
   @Column(DataType.TEXT)
   bio: string;
 
   @Column(DataType.FLOAT)
   dailyRate: number;
 
-  @Column(DataType.STRING)
-  mobile: string;
-
-  @Column(DataType.STRING)
-  phone: string;
-
-  @Column(DataType.STRING)
-  planStatus: string;
-
-  @Column(DataType.STRING)
-  profileEmail: string;
-
-  @Column(DataType.STRING)
-  isOrganisation: string;
-
   @Column(DataType.ARRAY(DataType.STRING))
   services: string[];
 
   @Column(DataType.STRING)
   state: string;
-
-  @Column(DataType.STRING)
-  suburb: string;
 
   @HasMany(() => ChatUser)
   chatUsers: ChatUser[];
