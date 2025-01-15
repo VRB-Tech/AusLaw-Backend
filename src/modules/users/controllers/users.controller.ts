@@ -12,9 +12,9 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create.dto';
-import { User } from './users.model';
-import { UsersService } from './users.service';
+import { CreateUserDto } from './../dto/create.dto';
+import { User } from './../users.model';
+import { UsersService } from './../users.service';
 
 @Controller('users')
 export class UsersController {

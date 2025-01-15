@@ -1,0 +1,1016 @@
+[
+  {
+      "name": "Accountant",
+      "child": [
+          {
+              "name": "Assurance"
+          },
+          {
+              "name": "Commercial"
+          },
+          {
+              "name": "Treasury"
+          },
+          {
+              "name": "Financial Accounting"
+          },
+          {
+              "name": "Forensic Accounting"
+          },
+          {
+              "name": "Insolvency | Liquidation"
+          },
+          {
+              "name": "Internal Audit"
+          },
+          {
+              "name": "Management Accounting"
+          },
+          {
+              "name": "Risk Assessment"
+          },
+          {
+              "name": "Taxation"
+          },
+          {
+              "name": "Financial Planner"
+          }
+      ]
+  },
+  {
+      "name": "Allied Health",
+      "child": [
+          {
+              "name": "Arts | Music Therapy"
+          },
+          {
+              "name": "Audiology"
+          },
+          {
+              "name": "Children's Psychology | Services"
+          },
+          {
+              "name": "Chirpoatric"
+          },
+          {
+              "name": "Dietetics"
+          },
+          {
+              "name": "Exercise Physiologist"
+          },
+          {
+              "name": "Genetic Counselling"
+          },
+          {
+              "name": "Occupational Therapy"
+          },
+          {
+              "name": "Optometry / Orthoptics"
+          },
+          {
+              "name": "Orthotics / Prosthetics"
+          },
+          {
+              "name": "Osteopathy"
+          },
+          {
+              "name": "Physiotherapy"
+          },
+          {
+              "name": "Podiatry"
+          },
+          {
+              "name": "Psychology"
+          },
+          {
+              "name": "Rehabilitation"
+          },
+          {
+              "name": "Social Work"
+          },
+          {
+              "name": "Speech Therapy"
+          }
+      ]
+  },
+  {
+      "name": "Arbitrator",
+      "child": [
+          {
+              "name": "Administrative"
+          },
+          {
+              "name": "Banking and Finance"
+          },
+          {
+              "name": "Building and Construction"
+          },
+          {
+              "name": "Commercial and Contract"
+          },
+          {
+              "name": "Competition and Consumer"
+          },
+          {
+              "name": "Corporate"
+          },
+          {
+              "name": "Criminal"
+          },
+          {
+              "name": "Elder"
+          },
+          {
+              "name": "Employment and Industrial"
+          },
+          {
+              "name": "Family"
+          },
+          {
+              "name": "Franchising"
+          },
+          {
+              "name": "Immigration"
+          },
+          {
+              "name": "Insurance"
+          },
+          {
+              "name": "Intellectual Property"
+          },
+          {
+              "name": "Maritime and Fisheries"
+          },
+          {
+              "name": "Natural Resources and Mining"
+          },
+          {
+              "name": "Personal Injuries"
+          },
+          {
+              "name": "Planning and Environment"
+          },
+          {
+              "name": "Professional Misconduct"
+          },
+          {
+              "name": "Property"
+          },
+          {
+              "name": "Restructuring | Insolvency"
+          },
+          {
+              "name": "Super, Tax and Revenue"
+          },
+          {
+              "name": "Wills and Estates | Succession"
+          },
+          {
+              "name": "Collaborative"
+          },
+          {
+              "name": "Cyber Security"
+          },
+          {
+              "name": "Migration"
+          },
+          {
+              "name": "Sports"
+          },
+          {
+              "name": "Technology"
+          }
+      ]
+  },
+  {
+      "name": "Barrister",
+      "child": [
+          {
+              "name": "Alternative Dispute Resolution",
+              "child": [
+                  {
+                      "name": "Arbitration"
+                  },
+                  {
+                      "name": "Mediation"
+                  }
+              ]
+          },
+          {
+              "name": "Appellate",
+              "child": [
+                  {
+                      "name": "Civil appeals"
+                  }
+              ]
+          },
+          {
+              "name": "Commercial",
+              "child": [
+                  {
+                      "name": "Appellate"
+                  },
+                  {
+                      "name": "Bankruptcy"
+                  },
+                  {
+                      "name": "Building and Construction"
+                  },
+                  {
+                      "name": "Competition"
+                  },
+                  {
+                      "name": "Consumer Protection Law"
+                  },
+                  {
+                      "name": "Contractual Disputes"
+                  },
+                  {
+                      "name": "Corporate Insolvency"
+                  },
+                  {
+                      "name": "Corporations Law"
+                  },
+                  {
+                      "name": "Insurance"
+                  },
+                  {
+                      "name": "Intellectual Property"
+                  },
+                  {
+                      "name": "International Commercial Arbitration"
+                  },
+                  {
+                      "name": "Partnership Disputes"
+                  },
+                  {
+                      "name": "Professional Liability"
+                  },
+                  {
+                      "name": "Real Property"
+                  },
+                  {
+                      "name": "Restraint of Trade"
+                  },
+                  {
+                      "name": "Securities and Investments"
+                  },
+                  {
+                      "name": "Superannuation"
+                  },
+                  {
+                      "name": "Telecommunications and Broadcasting"
+                  },
+                  {
+                      "name": "Transport Law - Admiralty | Aviation | Maritime"
+                  }
+              ]
+          },
+          {
+              "name": "Common Law | Personal Injury",
+              "child": [
+                  {
+                      "name": "Appellate"
+                  },
+                  {
+                      "name": "Dust Diseases"
+                  },
+                  {
+                      "name": "Insurance - Disability Claims"
+                  },
+                  {
+                      "name": "Intentional Torts"
+                  },
+                  {
+                      "name": "Judicial Review - Motor Accidents"
+                  },
+                  {
+                      "name": "Judicial Review - Workers Compensation"
+                  },
+                  {
+                      "name": "Motor Vehicles"
+                  },
+                  {
+                      "name": "Negligence"
+                  },
+                  {
+                      "name": "Professional Negligence"
+                  },
+                  {
+                      "name": "Work injury Damages"
+                  },
+                  {
+                      "name": "Workers Compensation"
+                  }
+              ]
+          },
+          {
+              "name": "Criminal",
+              "child": [
+                  {
+                      "name": "Appellate"
+                  },
+                  {
+                      "name": "Crimes Against the Person"
+                  },
+                  {
+                      "name": "Drugs"
+                  },
+                  {
+                      "name": "Environmental and Planning Offences"
+                  },
+                  {
+                      "name": "Extradition"
+                  },
+                  {
+                      "name": "Fraud"
+                  },
+                  {
+                      "name": "Juvenile Justice"
+                  },
+                  {
+                      "name": "Mental Illness"
+                  },
+                  {
+                      "name": "Proceeds of Crime| Money Laundering"
+                  },
+                  {
+                      "name": "Property Offences"
+                  },
+                  {
+                      "name": "Sexual Assault"
+                  },
+                  {
+                      "name": "Traffic"
+                  },
+                  {
+                      "name": "White Collar and Corporate Crime"
+                  },
+                  {
+                      "name": "Work Health and Safety"
+                  }
+              ]
+          },
+          {
+              "name": "Defamation",
+              "child": [
+                  {
+                      "name": "Appellate"
+                  }
+              ]
+          },
+          {
+              "name": "Environment and planning",
+              "child": [
+                  {
+                      "name": "Appellate"
+                  },
+                  {
+                      "name": "Civil Enforcement"
+                  },
+                  {
+                      "name": "Compulsory Acquisition of Land Compensation"
+                  },
+                  {
+                      "name": "Environmental and Planning Offences"
+                  },
+                  {
+                      "name": "Local Government"
+                  },
+                  {
+                      "name": "Merit Appeals"
+                  },
+                  {
+                      "name": "Mining"
+                  },
+                  {
+                      "name": "Valuation of Land - Rating and Tax Appeals"
+                  }
+              ]
+          },
+          {
+              "name": "Equity",
+              "child": [
+                  {
+                      "name": "Appellate"
+                  },
+                  {
+                      "name": "Family Provision"
+                  },
+                  {
+                      "name": "Real Property"
+                  },
+                  {
+                      "name": "Trusts"
+                  },
+                  {
+                      "name": "Wills and Probate"
+                  }
+              ]
+          },
+          {
+              "name": "Family Law and Guardianship",
+              "child": [
+                  {
+                      "name": "Appellate"
+                  },
+                  {
+                      "name": "Domestic Violence and Protection"
+                  },
+                  {
+                      "name": "Parenting "
+                  },
+                  {
+                      "name": "Property"
+                  },
+                  {
+                      "name": "Child Protection"
+                  },
+                  {
+                      "name": "Legal Aid | Independent Children's Lawyer"
+                  },
+                  {
+                      "name": "Child Support"
+                  }
+              ]
+          },
+          {
+              "name": "Industrial | Employment",
+              "child": [
+                  {
+                      "name": "Appellate"
+                  },
+                  {
+                      "name": "Discrimination"
+                  },
+                  {
+                      "name": "Employment Contracts and Restraint of Trade"
+                  },
+                  {
+                      "name": "Industrial Disputes and Statutory Employment Rights"
+                  },
+                  {
+                      "name": "Public Sector Appeals"
+                  },
+                  {
+                      "name": "Work Health and Safety"
+                  }
+              ]
+          },
+          {
+              "name": "Inquests | Inquiries",
+              "child": [
+                  {
+                      "name": "Commissions and other Inquiries"
+                  },
+                  {
+                      "name": "Coronial Inquests"
+                  }
+              ]
+          },
+          {
+              "name": "International",
+              "child": [
+                  {
+                      "name": "Choice of Law"
+                  },
+                  {
+                      "name": "International Commercial Arbitration"
+                  },
+                  {
+                      "name": "International Tax"
+                  },
+                  {
+                      "name": "Public International Law"
+                  }
+              ]
+          },
+          {
+              "name": "Public | Administrative",
+              "child": [
+                  {
+                      "name": "Appellate"
+                  },
+                  {
+                      "name": "Civil and Human Rights"
+                  },
+                  {
+                      "name": "Constitutional Law"
+                  },
+                  {
+                      "name": "Customs"
+                  },
+                  {
+                      "name": "Disciplinary Proceedings"
+                  },
+                  {
+                      "name": "Discrimination"
+                  },
+                  {
+                      "name": "Extradition"
+                  },
+                  {
+                      "name": "Immigration Law"
+                  },
+                  {
+                      "name": "Judicial Review and Administrative Law"
+                  },
+                  {
+                      "name": "Liquor Licensing"
+                  },
+                  {
+                      "name": "Merits Review"
+                  },
+                  {
+                      "name": "Native Title"
+                  },
+                  {
+                      "name": "Privacy| Freedom of Information"
+                  },
+                  {
+                      "name": "Proceeds of Crime"
+                  },
+                  {
+                      "name": "Social Security and Veteran Entitlements"
+                  }
+              ]
+          },
+          {
+              "name": "Tax | Revenue",
+              "child": [
+                  {
+                      "name": "Capital Gains Tax"
+                  },
+                  {
+                      "name": "Goods and Services Tax"
+                  },
+                  {
+                      "name": "Income Tax"
+                  },
+                  {
+                      "name": "International Tax"
+                  },
+                  {
+                      "name": "Land Tax"
+                  },
+                  {
+                      "name": "Payroll Tax"
+                  },
+                  {
+                      "name": "Stamp Duty and Other State Taxes"
+                  }
+              ]
+          },
+          {
+              "name": "Collaborative"
+          },
+          {
+              "name": "Sports"
+          },
+          {
+              "name": "Cyber Security"
+          },
+          {
+              "name": "Technology"
+          },
+          {
+              "name": "Migration"
+          }
+      ]
+  },
+  {
+      "name": "Contact Centre"
+  },
+  {
+      "name": "Dentist",
+      "child": [
+          {
+              "name": "Cosmetic Dentistry"
+          },
+          {
+              "name": "Dento-maxillofacial Radiology"
+          },
+          {
+              "name": "Endodontics"
+          },
+          {
+              "name": "Forensic Odontology"
+          },
+          {
+              "name": "General Dentistry"
+          },
+          {
+              "name": "Oral Medicine"
+          },
+          {
+              "name": "Oral Pathology"
+          },
+          {
+              "name": "Oral and Maxillofacial Surgery"
+          },
+          {
+              "name": "Orthodontics"
+          },
+          {
+              "name": "Paediatric Dentistry"
+          },
+          {
+              "name": "Periodontics"
+          },
+          {
+              "name": "Prosthodontics"
+          },
+          {
+              "name": "Public Health Dentistry (Community Dentistry)"
+          },
+          {
+              "name": "Special Needs Dentistry"
+          }
+      ]
+  },
+  {
+      "name": "Doctor",
+      "child": [
+          {
+              "name": "Addiction Medicine"
+          },
+          {
+              "name": "Anaesthesia"
+          },
+          {
+              "name": "Dermatology"
+          },
+          {
+              "name": "Emergency Medicine"
+          },
+          {
+              "name": "General Practice"
+          },
+          {
+              "name": "General Surgery"
+          },
+          {
+              "name": "Intensive Care Medicine"
+          },
+          {
+              "name": "Medical Administration"
+          },
+          {
+              "name": "Neurosurgery"
+          },
+          {
+              "name": "Obstetrics and Gynaecology"
+          },
+          {
+              "name": "Occupational and Environmental Medicine"
+          },
+          {
+              "name": "Ophthalmology"
+          },
+          {
+              "name": "Oral and Maxillofacial Surgery"
+          },
+          {
+              "name": "Orthopaedic Surgery"
+          },
+          {
+              "name": "Otolaryngology"
+          },
+          {
+              "name": "Paediatrics and Child Health"
+          },
+          {
+              "name": "Pain Medicine"
+          },
+          {
+              "name": "Palliative Medicine"
+          },
+          {
+              "name": "Pathology"
+          },
+          {
+              "name": "Physician"
+          },
+          {
+              "name": "Plastic Surgery"
+          },
+          {
+              "name": "Psychiatry"
+          },
+          {
+              "name": "Public Health Medicine"
+          },
+          {
+              "name": "Radiation Oncology"
+          },
+          {
+              "name": "Radiology"
+          },
+          {
+              "name": "Rehabilitation Medicine"
+          },
+          {
+              "name": "Sexual Health Medicine"
+          },
+          {
+              "name": "Sports and Exercise Medicine"
+          },
+          {
+              "name": "Urology"
+          },
+          {
+              "name": "Vascular Surgery"
+          }
+      ]
+  },
+  {
+      "name": "Drug Testing"
+  },
+  {
+      "name": "External Support Service",
+      "child": [
+          {
+              "name": "Cost Assessors"
+          },
+          {
+              "name": "Dictation | Word Processing"
+          },
+          {
+              "name": "Justices of the Peace | Commissioner for Declarations"
+          },
+          {
+              "name": "Litigation Support"
+          },
+          {
+              "name": "Precedent | Document Generation"
+          },
+          {
+              "name": "Printing | Document Management"
+          },
+          {
+              "name": "Secretarial | Virtual Assistant"
+          },
+          {
+              "name": "Service | Investigation | Surveilance Agents"
+          },
+          {
+              "name": "Stationary"
+          },
+          {
+              "name": "Translators"
+          }
+      ]
+  },
+  {
+      "name": "Family Report Writer"
+  },
+  {
+      "name": "Mediation | Conference Facilities"
+  },
+  {
+      "name": "Mediator",
+      "child": [
+          {
+              "name": "Administrative"
+          },
+          {
+              "name": "Banking and Finance"
+          },
+          {
+              "name": "Building and Construction"
+          },
+          {
+              "name": "Commercial and Contract"
+          },
+          {
+              "name": "Competition and Consumer"
+          },
+          {
+              "name": "Corporate"
+          },
+          {
+              "name": "Criminal"
+          },
+          {
+              "name": "Elder"
+          },
+          {
+              "name": "Employment and Industrial"
+          },
+          {
+              "name": "Family"
+          },
+          {
+              "name": "Franchising"
+          },
+          {
+              "name": "Immigration"
+          },
+          {
+              "name": "Insurance"
+          },
+          {
+              "name": "Intellectual Property"
+          },
+          {
+              "name": "Litigation and Dispute Resolution"
+          },
+          {
+              "name": "Maritime and Fisheries"
+          },
+          {
+              "name": "Natural Resources and Mining"
+          },
+          {
+              "name": "Personal Injuries"
+          },
+          {
+              "name": "Planning and Environment"
+          },
+          {
+              "name": "Professional Misconduct"
+          },
+          {
+              "name": "Property"
+          },
+          {
+              "name": "Restructuring | Insolvency"
+          },
+          {
+              "name": "Super | Tax and Revenue"
+          },
+          {
+              "name": "Wills and Estates | Succession"
+          },
+          {
+              "name": "Collaborate"
+          },
+          {
+              "name": "Familly Dispute Resolution Practitioner(FDRP)"
+          },
+          {
+              "name": "Migration"
+          },
+          {
+              "name": "Sports"
+          },
+          {
+              "name": "Technology"
+          },
+          {
+              "name": "Cyber Security"
+          }
+      ]
+  },
+  {
+      "name": "Parenting Coordinator"
+  },
+  {
+      "name": "Solicitor",
+      "child": [
+          {
+              "name": "Administrative"
+          },
+          {
+              "name": "Banking and Finance"
+          },
+          {
+              "name": "Building and Construction"
+          },
+          {
+              "name": "Commercial and Contract"
+          },
+          {
+              "name": "Competition and Consumer"
+          },
+          {
+              "name": "Corporate"
+          },
+          {
+              "name": "Criminal"
+          },
+          {
+              "name": "Elder"
+          },
+          {
+              "name": "Employment and Industrial"
+          },
+          {
+              "name": "Family"
+          },
+          {
+              "name": "Franchising"
+          },
+          {
+              "name": "Immigration"
+          },
+          {
+              "name": "Insurance"
+          },
+          {
+              "name": "Intellectual Property"
+          },
+          {
+              "name": "Litigation and Dispute Resolution"
+          },
+          {
+              "name": "Maritime and Fisheries"
+          },
+          {
+              "name": "Natural Resources and Mining"
+          },
+          {
+              "name": "Natural Resources and Mining - Land Access"
+          },
+          {
+              "name": "Personal Injuries"
+          },
+          {
+              "name": "Planning and Environment"
+          },
+          {
+              "name": "Professional Misconduct"
+          },
+          {
+              "name": "Property - Commercial"
+          },
+          {
+              "name": "Property - Residential"
+          },
+          {
+              "name": "Property - Rural | Other"
+          },
+          {
+              "name": "Restructuring | Insolvency"
+          },
+          {
+              "name": "Superannuation | Tax and Revenue"
+          },
+          {
+              "name": "Wills and Estates | Succession"
+          },
+          {
+              "name": "Child Protection"
+          },
+          {
+              "name": "Collaborative"
+          },
+          {
+              "name": "Cybex Security"
+          },
+          {
+              "name": "Domestic Violence"
+          },
+          {
+              "name": "Independent Children's Lawyer"
+          },
+          {
+              "name": "Migration"
+          },
+          {
+              "name": "Sports"
+          },
+          {
+              "name": "Technology"
+          }
+      ]
+  },
+  {
+      "name": "Valuer | Property Agent",
+      "child": [
+          {
+              "name": "Business | Commercial Sales"
+          },
+          {
+              "name": "Business | Commercial Valuers"
+          },
+          {
+              "name": "Chattle Sales"
+          },
+          {
+              "name": "Chattle Valuers"
+          },
+          {
+              "name": "Commercial Property Sales"
+          },
+          {
+              "name": "Commercial Property Valuers"
+          },
+          {
+              "name": "Quantity Surveyor"
+          },
+          {
+              "name": "Residential Property Sales"
+          },
+          {
+              "name": "Residential Property Valuers"
+          },
+          {
+              "name": "Rural Property Sales"
+          },
+          {
+              "name": "Rural Property Valuers"
+          }
+      ]
+  }
+]

@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
 import { Op, WhereOptions } from 'sequelize';
+import { DataNode } from 'src/types/DataParseNode';
 import { CreateUserDto } from './dto/create.dto';
 import { User } from './users.model';
 
