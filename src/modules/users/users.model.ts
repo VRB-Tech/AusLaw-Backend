@@ -115,8 +115,8 @@ export class User extends Model<User> {
   @Column(DataType.ARRAY(DataType.STRING))
   services: string[];
 
-  @Column(DataType.STRING)
-  state: string;
+  @Column(DataType.ARRAY(DataType.STRING))
+  locations: string[];
 
   @HasMany(() => ChatUser)
   chatUsers: ChatUser[];
