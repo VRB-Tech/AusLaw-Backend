@@ -1,7 +1,7 @@
-import Nylas from 'nylas';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import Nylas from 'nylas';
 
 @Injectable()
 export class NylasService {
@@ -33,34 +33,14 @@ export class NylasService {
     };
 
     try {
-      const response = await axios.post(
-        `${this.apiUrl}/v3/connect/token`,
-        body,
-        {
-          headers: { 'Content-Type': 'application/json' },
-        },
-      );
+      const response = await axios.post(`${this.apiUrl}/v3/connect/token`, body, {
+        headers: { 'Content-Type': 'application/json' },
+      });
 
       return response.data;
     } catch (error) {
-      console.error(
-        'Error exchanging code for token:',
-        error.response?.data || error.message,
-      );
+      console.error('Error exchanging code for token:', error.response?.data || error.message);
       throw new Error('Failed to exchange authorization code for token');
-    }
-  }
-
-  async getCalendars(grantId: string) {
-    try {
-      const calendars = await this.nylas.calendars.list({
-        identifier: grantId,
-      });
-
-      return calendars;
-    } catch (error) {
-      console.error('Error fetching calendars:', error.message);
-      throw error;
     }
   }
 
@@ -74,6 +54,19 @@ export class NylasService {
       return calendar;
     } catch (error) {
       console.error('Error fetching calendar:', error.message);
+      throw error;
+    }
+  }
+
+  async getCalendars(grantId: string) {
+    try {
+      const calendars = await this.nylas.calendars.list({
+        identifier: grantId,
+      });
+
+      return calendars;
+    } catch (error) {
+      console.error('Error fetching calendars:', error.message);
       throw error;
     }
   }
@@ -102,10 +95,7 @@ export class NylasService {
         },
       });
     } catch (error) {
-      console.error(
-        'Error deleting account:',
-        error.response?.data || error.message,
-      );
+      console.error('Error deleting account:', error.response?.data || error.message);
       throw new Error(
         `Failed to delete account: ${error.response?.data?.message || error.message}`,
       );
