@@ -27,7 +27,12 @@ export class AuthService {
   ) {}
 
   async registerUser(authDto: UserRegisterDto): Promise<UserResponseDto> {
-    const { isDoyles, firstName, lastName, email, password } = authDto;
+    const { isDoyles, firstName, lastName, email, password, role } = authDto;
+
+    if (role !== 'user' && role !== 'individual') {
+      throw new UnauthorizedException('Ivalid user role');
+    }
+
     const existingUser = await this.usersService.findByEmail(email);
 
     if (existingUser) {
@@ -40,7 +45,7 @@ export class AuthService {
       email,
       password,
       isDoyles,
-      role: 'user',
+      role,
     });
 
     return {
@@ -48,6 +53,7 @@ export class AuthService {
       email: newUser.email,
       firstName: newUser.firstName,
       lastName: newUser.lastName,
+      role: newUser.role,
     };
   }
 
@@ -119,6 +125,7 @@ export class AuthService {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
+          role: user.role,
         },
       };
     } else {
@@ -284,6 +291,7 @@ export class AuthService {
       email: profile.email,
       password: 'oauth',
       isDoyles: false,
+      role: 'user',
     });
 
     return {
@@ -291,6 +299,7 @@ export class AuthService {
       email: newUser.email,
       firstName: newUser.firstName,
       lastName: newUser.lastName,
+      role: newUser.role,
     };
   }
 }

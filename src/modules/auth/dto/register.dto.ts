@@ -1,4 +1,5 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { UserRole } from 'src/types/UserRole';
 
 export class BaseAuthDto {
   @IsBoolean({
@@ -30,6 +31,14 @@ export class BaseAuthDto {
     message: 'The "password" field must be at least 6 characters long.',
   })
   password: string;
+
+  @IsString({
+    message: 'The "role" field must be a string.',
+  })
+  @IsNotEmpty({
+    message: 'The "role" field cannot be empty.',
+  })
+  role: UserRole;
 }
 
 export class OrganisationRegisterDto extends BaseAuthDto {
