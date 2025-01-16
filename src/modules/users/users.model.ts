@@ -1,3 +1,4 @@
+import { IsNotEmpty } from 'class-validator';
 import {
   AutoIncrement,
   BelongsToMany,
@@ -101,8 +102,8 @@ export class User extends Model<User> {
 
   @Column({
     type: DataType.STRING,
-    defaultValue: 'user',
   })
+  @IsNotEmpty({ message: 'Role is required' })
   role: UserRole;
 
   @Column(DataType.TEXT)
