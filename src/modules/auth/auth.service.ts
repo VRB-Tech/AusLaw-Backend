@@ -37,12 +37,12 @@ export class AuthService {
       throw new ConflictException('User already exists');
     }
 
-    const registerToken = this.jwtService.sign(
+    const registrationToken = this.jwtService.sign(
       { isDoyles, email, firstName, lastName, role, password },
       { expiresIn: '1h' },
     );
 
-    const redirectUrl = `http://localhost:3000/register?token=${registerToken}`;
+    const redirectUrl = `http://localhost:3000/register?token=${registrationToken}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -54,9 +54,9 @@ export class AuthService {
     });
   }
 
-  async confirmUserRegistration(registerToken: string): Promise<UserResponseDto> {
+  async confirmUserRegistration(registrationToken: string): Promise<UserResponseDto> {
     try {
-      const decoded = this.jwtService.verify(registerToken);
+      const decoded = this.jwtService.verify(registrationToken);
 
       const { isDoyles, email, firstName, lastName, password, role } = decoded;
 
@@ -97,12 +97,12 @@ export class AuthService {
       throw new ConflictException('Organisation already exists');
     }
 
-    const registerToken = this.jwtService.sign(
+    const registrationToken = this.jwtService.sign(
       { email, name, isDoyles, password },
       { expiresIn: '1h' },
     );
 
-    const redirectUrl = `http://localhost:3000/register?token=${registerToken}`;
+    const redirectUrl = `http://localhost:3000/register?token=${registrationToken}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -114,15 +114,17 @@ export class AuthService {
     });
   }
 
-  async confirmOrganisationRegistration(registerToken: string): Promise<OrganisationResponseDto> {
+  async confirmOrganisationRegistration(
+    registrationToken: string,
+  ): Promise<OrganisationResponseDto> {
     try {
-      const decoded = this.jwtService.verify(registerToken);
+      const decoded = this.jwtService.verify(registrationToken);
 
       const { isDoyles, email, name, password } = decoded;
 
-      const existingUser = await this.organisationsService.findByEmail(email);
+      const existingOrganisation = await this.organisationsService.findByEmail(email);
 
-      if (existingUser) {
+      if (existingOrganisation) {
         throw new ConflictException('User already exists');
       }
 
