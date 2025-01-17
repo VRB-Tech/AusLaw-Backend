@@ -59,7 +59,9 @@ export class AuthController {
   }
 
   @Post('register/confirm/user')
-  async confirmUserRegistration(@Body('token') registerToken: string): Promise<UserResponseDto> {
+  async confirmUserRegistration(
+    @Body('registrationToken') registerToken: string,
+  ): Promise<UserResponseDto> {
     return this.authService.confirmUserRegistration(registerToken);
   }
 
@@ -76,7 +78,7 @@ export class AuthController {
 
   @Post('register/confirm/organisation')
   async confirmOrganisationRegistration(
-    @Body('token') registerToken: string,
+    @Body('registrationToken') registerToken: string,
   ): Promise<OrganisationResponseDto> {
     return this.authService.confirmOrganisationRegistration(registerToken);
   }

@@ -102,7 +102,7 @@ export class AuthService {
       { expiresIn: '1h' },
     );
 
-    const redirectUrl = `http://localhost:3000/register-organisation-confirm?token=${registerToken}`;
+    const redirectUrl = `http://localhost:3000/register?token=${registerToken}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -118,9 +118,9 @@ export class AuthService {
     try {
       const decoded = this.jwtService.verify(registerToken);
 
-      const { isDoyles, email, name, password, role } = decoded;
+      const { isDoyles, email, name, password } = decoded;
 
-      const existingUser = await this.usersService.findByEmail(email);
+      const existingUser = await this.organisationsService.findByEmail(email);
 
       if (existingUser) {
         throw new ConflictException('User already exists');
