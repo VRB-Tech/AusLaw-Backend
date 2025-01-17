@@ -42,7 +42,7 @@ export class AuthService {
       { expiresIn: '1h' },
     );
 
-    const redirectUrl = `http://localhost:3000/register?token=${registrationToken}`;
+    const redirectUrl = `http://localhost:3000/en/register/confirm?token=${registrationToken}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -102,7 +102,7 @@ export class AuthService {
       { expiresIn: '1h' },
     );
 
-    const redirectUrl = `http://localhost:3000/register?token=${registrationToken}`;
+    const redirectUrl = `http://localhost:3000/en/register/confirm?token=${registrationToken}`;
 
     await this.mailerService.sendMail({
       to: email,
