@@ -8,10 +8,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from 'src/mailer/mail.service';
 import { OrganisationResponseDto } from '../organisations/dto/organisationResponse.dto';
-import { Organisation } from '../organisations/entities/Organisation';
 import { OrganisationsService } from '../organisations/organisations.service';
 import { UserResponseDto } from '../users/dto/userResponse.dto';
-import { User } from '../users/users.model';
 import { UsersService } from '../users/users.service';
 import { loginDto } from './dto/login.dto';
 import { OrganisationRegisterDto, UserRegisterDto } from './dto/register.dto';
@@ -26,11 +24,11 @@ export class AuthService {
     private readonly mailerService: MailerService,
   ) {}
 
-  async registerUser(authDto: UserRegisterDto): Promise<UserResponseDto> {
-    const { isDoyles, firstName, lastName, email, password, role } = authDto;
+  async registerUser(authDto: UserRegisterDto): Promise<void> {
+    const { isDoyles, email, firstName, lastName, role, password } = authDto;
 
     if (role !== 'user' && role !== 'individual') {
-      throw new UnauthorizedException('Ivalid user role');
+      throw new UnauthorizedException('Invalid user role');
     }
 
     const existingUser = await this.usersService.findByEmail(email);
@@ -39,26 +37,59 @@ export class AuthService {
       throw new ConflictException('User already exists');
     }
 
-    const newUser = await this.usersService.create({
-      firstName,
-      lastName,
-      email,
-      password,
-      isDoyles,
-      role,
-    });
+    const registerToken = this.jwtService.sign(
+      { isDoyles, email, firstName, lastName, role, password },
+      { expiresIn: '1h' },
+    );
 
-    return {
-      id: newUser.id,
-      email: newUser.email,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      role: newUser.role,
-    };
+    const redirectUrl = `http://localhost:3000/register?token=${registerToken}`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Complete Your Registration',
+      html: `
+        <p>Click the link below to complete your registration:</p>
+        <a href="${redirectUrl}">Complete Registration</a>
+      `,
+    });
   }
 
-  async registerOrganisation(authDto: OrganisationRegisterDto): Promise<OrganisationResponseDto> {
-    const { email, name, password, isDoyles } = authDto;
+  async confirmUserRegistration(registerToken: string): Promise<UserResponseDto> {
+    try {
+      const decoded = this.jwtService.verify(registerToken);
+
+      const { isDoyles, email, firstName, lastName, password, role } = decoded;
+
+      const existingUser = await this.usersService.findByEmail(email);
+
+      if (existingUser) {
+        throw new ConflictException('User already exists');
+      }
+
+      const newUser = await this.usersService.create({
+        email,
+        firstName,
+        lastName,
+        password,
+        isDoyles,
+        role,
+      });
+
+      return {
+        id: newUser.id,
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        isDoyles: newUser.isDoyles,
+        role: newUser.role,
+      };
+    } catch (err) {
+      throw new UnauthorizedException('Invalid or expired registration token');
+    }
+  }
+
+  async registerOrganisation(authDto: OrganisationRegisterDto): Promise<void> {
+    const { email, name, isDoyles, password } = authDto;
 
     const existingOrganisation = await this.organisationsService.findByEmail(email);
 
@@ -66,26 +97,57 @@ export class AuthService {
       throw new ConflictException('Organisation already exists');
     }
 
-    const newOrganisation = await this.organisationsService.create({
-      isDoyles: isDoyles ?? false,
-      name,
-      email,
-      password,
-    });
+    const registerToken = this.jwtService.sign(
+      { email, name, isDoyles, password },
+      { expiresIn: '1h' },
+    );
 
-    return {
-      id: newOrganisation.id,
-      email: newOrganisation.email,
-      name: newOrganisation.name,
-      isDoyles: newOrganisation.isDoyles,
-    };
+    const redirectUrl = `http://localhost:3000/register-organisation-confirm?token=${registerToken}`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Complete Your Organisation Registration',
+      html: `
+        <p>Click the link below to complete your organisation registration:</p>
+        <a href="${redirectUrl}">Complete Registration</a>
+      `,
+    });
+  }
+
+  async confirmOrganisationRegistration(registerToken: string): Promise<OrganisationResponseDto> {
+    try {
+      const decoded = this.jwtService.verify(registerToken);
+
+      const { isDoyles, email, name, password, role } = decoded;
+
+      const existingUser = await this.usersService.findByEmail(email);
+
+      if (existingUser) {
+        throw new ConflictException('User already exists');
+      }
+
+      const newUser = await this.organisationsService.create({
+        email,
+        name,
+        password,
+        isDoyles,
+      });
+
+      return {
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name,
+        isDoyles: newUser.isDoyles,
+      };
+    } catch (err) {
+      throw new UnauthorizedException('Invalid or expired registration token');
+    }
   }
 
   async login(
     loginDto: loginDto,
   ): Promise<
-    | { accessToken: string; refreshToken: string; account: UserResponseDto }
-    | { accessToken: string; refreshToken: string; account: OrganisationResponseDto }
+    { accessToken: string; refreshToken: string } | { accessToken: string; refreshToken: string }
   > {
     const { email, password, type } = loginDto;
 
@@ -106,43 +168,16 @@ export class AuthService {
 
     const payload: JwtPayload = {
       email: account.email,
-      subject: account.id,
+      subject: account,
     };
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: '14d' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '30d' });
 
-    if (type === 'user') {
-      const user = account as User;
-      await this.usersService.updateRefreshToken(user.id, refreshToken);
-
-      return {
-        accessToken,
-        refreshToken,
-        account: {
-          id: user.id,
-          isDoyles: user.isDoyles,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          role: user.role,
-        },
-      };
-    } else {
-      const organisation = account as Organisation;
-      await this.organisationsService.updateRefreshToken(organisation.id, refreshToken);
-
-      return {
-        accessToken,
-        refreshToken,
-        account: {
-          id: organisation.id,
-          email: organisation.email,
-          name: organisation.name,
-          isDoyles: organisation.isDoyles,
-        },
-      };
-    }
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   async refreshTokenForUser(
@@ -159,7 +194,7 @@ export class AuthService {
 
       const payload: JwtPayload = {
         email: user.email,
-        subject: user.id,
+        subject: user,
         role: user.role,
       };
 
@@ -194,7 +229,7 @@ export class AuthService {
 
       const payload: JwtPayload = {
         email: organisation.email,
-        subject: organisation.id,
+        subject: organisation,
       };
 
       const newAccessToken = this.jwtService.sign(payload, { expiresIn: '14d' });
@@ -300,6 +335,7 @@ export class AuthService {
       firstName: newUser.firstName,
       lastName: newUser.lastName,
       role: newUser.role,
+      isDoyles: newUser.isDoyles,
     };
   }
 }

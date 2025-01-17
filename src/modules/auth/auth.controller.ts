@@ -14,6 +14,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
+import { OrganisationResponseDto } from '../organisations/dto/organisationResponse.dto';
+import { UserResponseDto } from '../users/dto/userResponse.dto';
 import { AuthService } from './auth.service';
 import { loginDto } from './dto/login.dto';
 import { OrganisationRegisterDto, UserRegisterDto } from './dto/register.dto';
@@ -49,24 +51,34 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async registerUser(@Body() userRegisterDto: UserRegisterDto) {
-    const user = await this.authService.registerUser(userRegisterDto);
+    await this.authService.registerUser(userRegisterDto);
 
     return {
-      message: 'User registered successfully',
-      account: user,
+      message: 'Link successfully sent to your email.',
     };
+  }
+
+  @Post('register/user/confirm')
+  async confirmUserRegistration(@Body('token') registerToken: string): Promise<UserResponseDto> {
+    return this.authService.confirmUserRegistration(registerToken);
   }
 
   @Post('register/organisation')
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async registerOrganisation(@Body() organisationRegisterDto: OrganisationRegisterDto) {
-    const organisation = await this.authService.registerOrganisation(organisationRegisterDto);
+    await this.authService.registerOrganisation(organisationRegisterDto);
 
     return {
-      message: 'Organisation registered successfully',
-      account: organisation,
+      message: 'Link successfully sent to your email.',
     };
+  }
+
+  @Post('register/organisation/confirm')
+  async confirmOrganisationRegistration(
+    @Body('token') registerToken: string,
+  ): Promise<OrganisationResponseDto> {
+    return this.authService.confirmOrganisationRegistration(registerToken);
   }
 
   @Post('login')

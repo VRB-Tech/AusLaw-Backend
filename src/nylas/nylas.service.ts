@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import { addMonths, startOfDay } from 'date-fns';
 import Nylas from 'nylas';
 
 @Injectable()
@@ -73,10 +74,15 @@ export class NylasService {
 
   async getAllEventsFromCalendar(calendarId: string, grantId: string) {
     try {
+      const now = startOfDay(new Date());
+      const threeMonthsLater = addMonths(now, 3);
+
       const events = await this.nylas.events.list({
         identifier: grantId,
         queryParams: {
           calendarId: calendarId,
+          start: now.toISOString(),
+          end: threeMonthsLater.toISOString(),
         },
       });
 

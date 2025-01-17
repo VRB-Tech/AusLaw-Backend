@@ -6,4 +6,5 @@ export interface UserResponseDto {
   lastName: string;
   email: string;
   role: UserRole;
+  isDoyles: boolean;
 }

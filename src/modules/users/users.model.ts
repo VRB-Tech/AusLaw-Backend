@@ -110,6 +110,9 @@ export class User extends Model<User> {
   bio: string;
 
   @Column(DataType.FLOAT)
+  hourlyRate: number;
+
+  @Column(DataType.FLOAT)
   dailyRate: number;
 
   @Column(DataType.ARRAY(DataType.STRING))
