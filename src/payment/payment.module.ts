@@ -7,6 +7,5 @@ import { PaymentService } from './payment.service';
   imports: [ConfigModule],
   providers: [PaymentService],
   controllers: [PaymentController],
-  exports: [PaymentService],
 })
 export class PaymentModule {}

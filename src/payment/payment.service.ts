@@ -50,6 +50,7 @@ export class PaymentService {
     try {
       const paymentIntent = await this.stripe.paymentIntents.create({ amount, currency });
       this.logger.log(`PaymentIntent created: ID=${paymentIntent.id}`);
+
       return paymentIntent;
     } catch (err) {
       this.logger.error('Error creating PaymentIntent', err.stack);
@@ -61,6 +62,7 @@ export class PaymentService {
     if (!email || !email.includes('@')) {
       throw new Error('Invalid email for customer creation');
     }
+
     if (!paymentMethodId) {
       throw new Error('Payment method ID is required to create a customer');
     }
