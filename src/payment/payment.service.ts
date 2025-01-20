@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { UsersService } from 'src/modules/users/users.service';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -8,10 +7,7 @@ export class PaymentService {
   private stripe: Stripe;
   private endpointSecret: string;
 
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly usersService: UsersService,
-  ) {
+  constructor(private readonly configService: ConfigService) {
     const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
     this.endpointSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
 
