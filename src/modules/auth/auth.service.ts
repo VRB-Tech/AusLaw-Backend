@@ -7,7 +7,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from 'src/mailer/mail.service';
-import { PaymentService } from 'src/payment/payment.service';
 import { OrganisationResponseDto } from '../organisations/dto/organisationResponse.dto';
 import { OrganisationsService } from '../organisations/organisations.service';
 import { UserResponseDto } from '../users/dto/userResponse.dto';
@@ -23,7 +22,6 @@ export class AuthService {
     private readonly organisationsService: OrganisationsService,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
-    private readonly paymentService: PaymentService,
   ) {}
 
   async registerUser(authDto: UserRegisterDto): Promise<void> {
