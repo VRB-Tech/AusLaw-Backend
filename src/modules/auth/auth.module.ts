@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerService } from 'src/mailer/mail.service';
-import { PaymentModule } from 'src/payment/payment.module';
 import { PaymentService } from 'src/payment/payment.service';
 import { OrganisationsModule } from '../organisations/organisations.module';
 import { UsersModule } from '../users/users.module';
@@ -16,7 +15,6 @@ import { JwtStrategy } from './strategies/jwt/jwt.strategy';
     ConfigModule.forRoot(),
     UsersModule,
     OrganisationsModule,
-    PaymentModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
