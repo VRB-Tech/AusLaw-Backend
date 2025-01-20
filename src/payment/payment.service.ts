@@ -36,11 +36,13 @@ export class PaymentService {
   }
 
   async createSubscription(customerId: string, priceId: string, trialPeriodDays: number = 14) {
-    return this.stripe.subscriptions.create({
+    const subscription = await this.stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: priceId }],
       trial_period_days: trialPeriodDays,
     });
+
+    return { id: subscription.id, status: subscription.status };
   }
 
   public verifyWebhookSignature(
