@@ -1,83 +1,123 @@
-// import { Injectable } from '@nestjs/common';
-// import { ConfigService } from '@nestjs/config';
-// import { UsersService } from 'src/modules/users/users.service';
-// import Stripe from 'stripe';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { UsersService } from 'src/modules/users/users.service';
+import Stripe from 'stripe';
 
-// @Injectable()
-// export class PaymentService {
-//   private stripe: Stripe;
+@Injectable()
+export class PaymentService {
+  private stripe: Stripe;
 
-//   constructor(
-//     private readonly configService: ConfigService,
-//     private readonly usersService: UsersService,
-//   ) {
-//     this.stripe = new Stripe(this.configService.get('STRIPE_SECRET_KEY'), {
-//       apiVersion: '2024-12-18.acacia',
-//     });
-//   }
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly usersService: UsersService,
+  ) {
+    const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
 
-//   async createPaymentIntent(amount: number, currency: string) {
-//     return this.stripe.paymentIntents.create({
-//       amount,
-//       currency,
-//     });
-//   }
+    if (!stripeSecretKey) {
+      throw new Error('Stripe secret key is not defined in environment variables');
+    }
 
-//   async createCustomer(email: string, paymentMethodId: string) {
-//     const customer = await this.stripe.customers.create({
-//       email,
-//       payment_method: paymentMethodId,
-//       invoice_settings: {
-//         default_payment_method: paymentMethodId,
-//       },
-//     });
+    this.stripe = new Stripe(stripeSecretKey, {
+      apiVersion: '2024-12-18.acacia',
+    });
+  }
 
-//     return customer;
-//   }
+  async createPaymentIntent(amount: number, currency: string) {
+    if (!amount || isNaN(amount) || amount <= 0) {
+      throw new Error('Invalid amount for PaymentIntent');
+    }
+    if (!currency || typeof currency !== 'string') {
+      throw new Error('Invalid currency for PaymentIntent');
+    }
 
-//   async createSubscription(customerId: string, priceId: string, trialPeriodDays: number = 14) {
-//     const subscription = await this.stripe.subscriptions.create({
-//       customer: customerId,
-//       items: [{ price: priceId }],
-//       trial_period_days: trialPeriodDays,
-//     });
+    try {
+      return await this.stripe.paymentIntents.create({ amount, currency });
+    } catch (err) {
+      console.error('Error creating PaymentIntent:', err.message);
+      throw new Error('Failed to create PaymentIntent');
+    }
+  }
 
-//     return { id: subscription.id, status: subscription.status };
-//   }
+  async createCustomer(email: string, paymentMethodId: string) {
+    if (!email || !email.includes('@')) {
+      throw new Error('Invalid email for customer creation');
+    }
+    if (!paymentMethodId) {
+      throw new Error('Payment method ID is required to create a customer');
+    }
 
-//   public verifyWebhookSignature(
-//     payload: string | Buffer,
-//     signature: string | string[],
-//     secret: string,
-//   ): Stripe.Event {
-//     try {
-//       return this.stripe.webhooks.constructEvent(payload, signature, secret);
-//     } catch (err) {
-//       throw new Error(`Webhook signature verification failed: ${err.message}`);
-//     }
-//   }
+    try {
+      return await this.stripe.customers.create({
+        email,
+        payment_method: paymentMethodId,
+        invoice_settings: { default_payment_method: paymentMethodId },
+      });
+    } catch (err) {
+      console.error('Error creating Stripe customer:', err.message);
+      throw new Error('Failed to create customer');
+    }
+  }
 
-//   async handleWebhook(event: Stripe.Event) {
-//     switch (event.type) {
-//       case 'customer.subscription.created':
-//         const createdSubscription = event.data.object as Stripe.Subscription;
+  async createSubscription(customerId: string, priceId: string, trialPeriodDays = 14) {
+    if (!customerId) {
+      throw new Error('Customer ID is required for subscription creation');
+    }
+    if (!priceId) {
+      throw new Error('Price ID is required for subscription creation');
+    }
 
-//         console.log(createdSubscription, 'createdSubscription');
+    try {
+      const subscription = await this.stripe.subscriptions.create({
+        customer: customerId,
+        items: [{ price: priceId }],
+        trial_period_days: trialPeriodDays,
+      });
 
-//         break;
+      return { id: subscription.id, status: subscription.status };
+    } catch (err) {
+      console.error('Error creating subscription:', err.message);
+      throw new Error('Failed to create subscription');
+    }
+  }
 
-//       case 'invoice.payment_succeeded':
-//         const paymentSucceeded = event.data.object as Stripe.Invoice;
-//         console.log('Payment succeeded:', paymentSucceeded);
-//         break;
+  public verifyWebhookSignature(
+    payload: string | Buffer,
+    signature: string | string[],
+    secret: string,
+  ): Stripe.Event {
+    if (!secret) {
+      throw new Error('Webhook secret is not defined');
+    }
 
-//       case 'invoice.payment_failed':
-//         const paymentFailed = event.data.object as Stripe.Invoice;
-//         console.log('Payment failed:', paymentFailed);
-//         break;
+    try {
+      return this.stripe.webhooks.constructEvent(payload, signature, secret);
+    } catch (err) {
+      console.error('Webhook verification failed:', err.message);
+      throw new Error('Invalid webhook signature');
+    }
+  }
 
-//       default:
-//         console.log(`Unhandled event type: ${event.type}`);
-//     }
-//   }
-// }
+  async handleWebhook(event: Stripe.Event) {
+    console.log(`Processing webhook event: ${event.type}`);
+
+    switch (event.type) {
+      case 'customer.subscription.created':
+        const createdSubscription = event.data.object as Stripe.Subscription;
+        console.log(`Subscription created: ID=${createdSubscription.id}`);
+        break;
+
+      case 'invoice.payment_succeeded':
+        const paymentSucceeded = event.data.object as Stripe.Invoice;
+        console.log(`Payment succeeded: Invoice ID=${paymentSucceeded.id}`);
+        break;
+
+      case 'invoice.payment_failed':
+        const paymentFailed = event.data.object as Stripe.Invoice;
+        console.log(`Payment failed: Invoice ID=${paymentFailed.id}`);
+        break;
+
+      default:
+        console.warn(`Unhandled event type: ${event.type}`);
+    }
+  }
+}
