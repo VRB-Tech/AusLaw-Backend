@@ -23,18 +23,19 @@ export class PaymentService {
       this.logger.warn('Stripe webhook secret is not defined in environment variables');
     }
 
-    if (!PaymentService.stripeInstance) {
-      this.logger.log('Initializing Stripe instance...');
-      PaymentService.stripeInstance = new Stripe(this.stripeSecretKey, {
-        apiVersion: '2024-12-18.acacia',
-      });
-    }
+    // if (!PaymentService.stripeInstance) {
+    //   this.logger.log('Initializing Stripe instance...');
+    //   PaymentService.stripeInstance = new Stripe(this.stripeSecretKey, {
+    //     apiVersion: '2024-12-18.acacia',
+    //   });
+    // }
   }
 
   private get stripe(): Stripe {
     if (!PaymentService.stripeInstance) {
       throw new Error('Stripe instance is not initialized');
     }
+
     return PaymentService.stripeInstance;
   }
 
