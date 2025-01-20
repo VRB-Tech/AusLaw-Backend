@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -7,20 +6,8 @@ export class PaymentService {
   public stripe: Stripe;
   public readonly logger = new Logger(PaymentService.name);
 
-  constructor(public readonly configService: ConfigService) {
-    const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
-    const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
-
-    if (!stripeSecretKey) {
-      this.logger.error('Stripe secret key is not defined in environment variables');
-      throw new Error('Stripe secret key is not defined in environment variables');
-    }
-
-    if (!webhookSecret) {
-      this.logger.warn('Stripe webhook secret is not defined in environment variables');
-    }
-
-    this.stripe = new Stripe(stripeSecretKey, {
+  constructor() {
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2024-12-18.acacia',
     });
   }
@@ -101,15 +88,12 @@ export class PaymentService {
     payload: string | Buffer,
     signature: string | string[],
   ): Stripe.Event {
-    const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
-
-    if (!webhookSecret) {
-      this.logger.error('Webhook secret is not defined');
-      throw new Error('Webhook secret is not defined');
-    }
-
     try {
-      return this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+      return this.stripe.webhooks.constructEvent(
+        payload,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET,
+      );
     } catch (err) {
       this.logger.error('Webhook verification failed:', err.stack);
       throw new Error('Invalid webhook signature');
