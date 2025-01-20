@@ -27,7 +27,7 @@ export class PaymentController {
     return await this.paymentService.createPaymentIntent(amount, currency);
   }
 
-  @Post('webhook')
+  @Post('webhooks')
   async handleWebhook(@Req() req: Request, @Res() res: Response) {
     const sig = req.headers['stripe-signature'];
     const endpointSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');

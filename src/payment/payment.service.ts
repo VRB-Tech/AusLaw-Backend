@@ -42,6 +42,7 @@ export class PaymentService {
     if (!email || !email.includes('@')) {
       throw new Error('Invalid email for customer creation');
     }
+
     if (!paymentMethodId) {
       throw new Error('Payment method ID is required to create a customer');
     }
@@ -62,6 +63,7 @@ export class PaymentService {
     if (!customerId) {
       throw new Error('Customer ID is required for subscription creation');
     }
+
     if (!priceId) {
       throw new Error('Price ID is required for subscription creation');
     }
