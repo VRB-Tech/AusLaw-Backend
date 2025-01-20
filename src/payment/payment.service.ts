@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/modules/users/users.service';
 import Stripe from 'stripe';
 
 @Injectable()
-export class PaymentService {
+export class PaymentService implements OnModuleInit {
   private stripe: Stripe;
   private readonly stripeSecretKey: string;
   private readonly endpointSecret: string;
@@ -19,7 +19,9 @@ export class PaymentService {
     if (!this.stripeSecretKey) {
       throw new Error('Stripe secret key is not defined in environment variables');
     }
+  }
 
+  onModuleInit() {
     this.stripe = new Stripe(this.stripeSecretKey, {
       apiVersion: '2024-12-18.acacia',
     });
