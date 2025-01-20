@@ -82,6 +82,18 @@ export class User extends Model<User> {
   @Column(DataType.STRING)
   refreshToken?: string;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  paymentStatus: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  paymentIntentId: string;
+
   @Column(DataType.STRING)
   grantId: string;
 

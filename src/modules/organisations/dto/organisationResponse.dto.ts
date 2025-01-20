@@ -12,4 +12,10 @@ export class OrganisationResponseDto {
 
   @IsBoolean()
   isDoyles: boolean;
+
+  @IsString()
+  paymentLink?: string;
+
+  @IsString()
+  subscriptionId?: string;
 }

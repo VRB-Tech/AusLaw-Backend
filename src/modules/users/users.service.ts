@@ -2,7 +2,6 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
 import { Op, WhereOptions } from 'sequelize';
-import { DataNode } from 'src/types/DataParseNode';
 import { CreateUserDto } from './dto/create.dto';
 import { User } from './users.model';
 
@@ -81,6 +80,14 @@ export class UsersService {
     await this.userModel.update({ refreshToken: hashedToken }, { where: { id: userId } });
 
     return refreshToken;
+  }
+
+  async updatePaymentStatus(
+    userId: number,
+    paymentStatus: string,
+    paymentIntentId: string,
+  ): Promise<void> {
+    await this.userModel.update({ paymentStatus, paymentIntentId }, { where: { id: userId } });
   }
 
   async updatePassword(userId: number, newPassword: string): Promise<string> {

@@ -32,6 +32,17 @@ export class OrganisationsService {
     });
   }
 
+  async updatePaymentStatus(
+    organisationId: number,
+    paymentStatus: string,
+    paymentIntentId: string,
+  ): Promise<void> {
+    await this.organisationModel.update(
+      { paymentStatus, paymentIntentId },
+      { where: { id: organisationId } },
+    );
+  }
+
   async updateRefreshToken(id: number, refreshToken: string | null): Promise<void> {
     const hashedRefreshToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
 

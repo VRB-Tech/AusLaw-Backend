@@ -23,6 +23,7 @@ import { PostsModule } from './modules/posts/posts.module';
 import { User } from './modules/users/users.model';
 import { UsersModule } from './modules/users/users.module';
 import { NylasModule } from './nylas/nylas.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { NylasModule } from './nylas/nylas.module';
     NylasModule,
     WebSocketModule,
     OrganisationsModule,
+    PaymentModule,
   ],
 })
 export class AppModule {}

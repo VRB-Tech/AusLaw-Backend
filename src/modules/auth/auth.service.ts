@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from 'src/mailer/mail.service';
+import { PaymentService } from 'src/payment/payment.service';
 import { OrganisationResponseDto } from '../organisations/dto/organisationResponse.dto';
 import { OrganisationsService } from '../organisations/organisations.service';
 import { UserResponseDto } from '../users/dto/userResponse.dto';
@@ -22,6 +23,7 @@ export class AuthService {
     private readonly organisationsService: OrganisationsService,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   async registerUser(authDto: UserRegisterDto): Promise<void> {
@@ -42,7 +44,7 @@ export class AuthService {
       { expiresIn: '1h' },
     );
 
-    const redirectUrl = `http://localhost:3000/en/register/confirm?token=${registrationToken}`;
+    const redirectUrl = `http://localhost:3000/en/register/confirm?token=${registrationToken}&accountType=user`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -75,6 +77,25 @@ export class AuthService {
         role,
       });
 
+      if (isDoyles) {
+        const priceId = role === 'user' ? 'price_monthly' : 'price_annual';
+
+        const customer = await this.paymentService.createCustomer(email, 'pm_card_visa');
+        const subscription = await this.paymentService.createSubscription(customer.id, priceId);
+
+        await this.usersService.updatePaymentStatus(newUser.id, 'pending', subscription.id);
+
+        return {
+          id: newUser.id,
+          email: newUser.email,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          isDoyles: newUser.isDoyles,
+          role: newUser.role,
+          subscriptionId: subscription.id,
+        };
+      }
+
       return {
         id: newUser.id,
         email: newUser.email,
@@ -99,10 +120,10 @@ export class AuthService {
 
     const registrationToken = this.jwtService.sign(
       { email, name, isDoyles, password },
-      { expiresIn: '1h' },
+      { expiresIn: '15m' },
     );
 
-    const redirectUrl = `http://localhost:3000/en/register/confirm?token=${registrationToken}`;
+    const redirectUrl = `http://localhost:3000/en/register/confirm?token=${registrationToken}&accountType=organisation`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -125,21 +146,42 @@ export class AuthService {
       const existingOrganisation = await this.organisationsService.findByEmail(email);
 
       if (existingOrganisation) {
-        throw new ConflictException('User already exists');
+        throw new ConflictException('Organisation already exists');
       }
 
-      const newUser = await this.organisationsService.create({
+      const newOrganisation = await this.organisationsService.create({
         email,
         name,
         password,
         isDoyles,
       });
 
+      if (isDoyles) {
+        const priceId = 'price_annual';
+
+        const customer = await this.paymentService.createCustomer(email, 'pm_card_visa');
+        const subscription = await this.paymentService.createSubscription(customer.id, priceId);
+
+        await this.organisationsService.updatePaymentStatus(
+          newOrganisation.id,
+          'pending',
+          subscription.id,
+        );
+
+        return {
+          id: newOrganisation.id,
+          email: newOrganisation.email,
+          name: newOrganisation.name,
+          isDoyles: newOrganisation.isDoyles,
+          subscriptionId: subscription.id,
+        };
+      }
+
       return {
-        id: newUser.id,
-        email: newUser.email,
-        name: newUser.name,
-        isDoyles: newUser.isDoyles,
+        id: newOrganisation.id,
+        email: newOrganisation.email,
+        name: newOrganisation.name,
+        isDoyles: newOrganisation.isDoyles,
       };
     } catch (err) {
       throw new UnauthorizedException('Invalid or expired registration token');

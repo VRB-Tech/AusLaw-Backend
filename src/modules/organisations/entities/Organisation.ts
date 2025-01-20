@@ -47,4 +47,16 @@ export class Organisation extends Model<Organisation> {
 
   @Column(DataType.STRING)
   refreshToken?: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  paymentStatus: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  paymentIntentId: string;
 }
