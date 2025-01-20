@@ -4,42 +4,31 @@ import Stripe from 'stripe';
 
 @Injectable()
 export class PaymentService {
-  private static stripeInstance: Stripe | null = null;
-  private readonly logger = new Logger(PaymentService.name);
+  public stripe: Stripe;
+  public readonly logger = new Logger(PaymentService.name);
 
-  private readonly stripeSecretKey: string;
-  private readonly webhookSecret: string;
+  constructor(public readonly configService: ConfigService) {
+    const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
+    const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
 
-  constructor(private readonly configService: ConfigService) {
-    this.stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
-    this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
-
-    if (!this.stripeSecretKey) {
+    if (!stripeSecretKey) {
       this.logger.error('Stripe secret key is not defined in environment variables');
       throw new Error('Stripe secret key is not defined in environment variables');
     }
 
-    if (!this.webhookSecret) {
+    if (!webhookSecret) {
       this.logger.warn('Stripe webhook secret is not defined in environment variables');
     }
 
-    if (!PaymentService.stripeInstance) {
-      this.logger.log('Initializing Stripe instance...');
-      PaymentService.stripeInstance = new Stripe(this.stripeSecretKey, {
-        apiVersion: '2024-12-18.acacia',
-      });
-    }
+    this.stripe = new Stripe(stripeSecretKey, {
+      apiVersion: '2024-12-18.acacia',
+    });
   }
 
-  private get stripe(): Stripe {
-    if (!PaymentService.stripeInstance) {
-      throw new Error('Stripe instance is not initialized');
-    }
-
-    return PaymentService.stripeInstance;
-  }
-
-  async createPaymentIntent(amount: number, currency: string): Promise<Stripe.PaymentIntent> {
+  public async createPaymentIntent(
+    amount: number,
+    currency: string,
+  ): Promise<Stripe.PaymentIntent> {
     if (!amount || isNaN(amount) || amount <= 0) {
       throw new Error('Invalid amount for PaymentIntent');
     }
@@ -51,7 +40,6 @@ export class PaymentService {
     try {
       const paymentIntent = await this.stripe.paymentIntents.create({ amount, currency });
       this.logger.log(`PaymentIntent created: ID=${paymentIntent.id}`);
-
       return paymentIntent;
     } catch (err) {
       this.logger.error('Error creating PaymentIntent', err.stack);
@@ -59,7 +47,7 @@ export class PaymentService {
     }
   }
 
-  async createCustomer(email: string, paymentMethodId: string): Promise<Stripe.Customer> {
+  public async createCustomer(email: string, paymentMethodId: string): Promise<Stripe.Customer> {
     if (!email || !email.includes('@')) {
       throw new Error('Invalid email for customer creation');
     }
@@ -82,7 +70,7 @@ export class PaymentService {
     }
   }
 
-  async createSubscription(
+  public async createSubscription(
     customerId: string,
     priceId: string,
     trialPeriodDays = 14,
@@ -101,7 +89,6 @@ export class PaymentService {
         items: [{ price: priceId }],
         trial_period_days: trialPeriodDays,
       });
-
       this.logger.log(`Subscription created: ID=${subscription.id}`);
       return { id: subscription.id, status: subscription.status };
     } catch (err) {
@@ -114,15 +101,22 @@ export class PaymentService {
     payload: string | Buffer,
     signature: string | string[],
   ): Stripe.Event {
+    const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
+
+    if (!webhookSecret) {
+      this.logger.error('Webhook secret is not defined');
+      throw new Error('Webhook secret is not defined');
+    }
+
     try {
-      return this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecret);
+      return this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
     } catch (err) {
       this.logger.error('Webhook verification failed:', err.stack);
       throw new Error('Invalid webhook signature');
     }
   }
 
-  async handleWebhook(event: Stripe.Event): Promise<void> {
+  public async handleWebhook(event: Stripe.Event): Promise<void> {
     this.logger.log(`Processing webhook event: ${event.type}`);
 
     switch (event.type) {
