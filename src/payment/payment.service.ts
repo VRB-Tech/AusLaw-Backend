@@ -6,12 +6,14 @@ import Stripe from 'stripe';
 @Injectable()
 export class PaymentService {
   private stripe: Stripe;
+  private endpointSecret: string;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
   ) {
     const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
+    this.endpointSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
 
     if (!stripeSecretKey) {
       throw new Error('Stripe secret key is not defined in environment variables');
@@ -38,61 +40,12 @@ export class PaymentService {
     }
   }
 
-  async createCustomer(email: string, paymentMethodId: string) {
-    if (!email || !email.includes('@')) {
-      throw new Error('Invalid email for customer creation');
-    }
-
-    if (!paymentMethodId) {
-      throw new Error('Payment method ID is required to create a customer');
-    }
-
-    try {
-      return await this.stripe.customers.create({
-        email,
-        payment_method: paymentMethodId,
-        invoice_settings: { default_payment_method: paymentMethodId },
-      });
-    } catch (err) {
-      console.error('Error creating Stripe customer:', err.message);
-      throw new Error('Failed to create customer');
-    }
-  }
-
-  async createSubscription(customerId: string, priceId: string, trialPeriodDays = 14) {
-    if (!customerId) {
-      throw new Error('Customer ID is required for subscription creation');
-    }
-
-    if (!priceId) {
-      throw new Error('Price ID is required for subscription creation');
-    }
-
-    try {
-      const subscription = await this.stripe.subscriptions.create({
-        customer: customerId,
-        items: [{ price: priceId }],
-        trial_period_days: trialPeriodDays,
-      });
-
-      return { id: subscription.id, status: subscription.status };
-    } catch (err) {
-      console.error('Error creating subscription:', err.message);
-      throw new Error('Failed to create subscription');
-    }
-  }
-
   public verifyWebhookSignature(
     payload: string | Buffer,
     signature: string | string[],
-    secret: string,
   ): Stripe.Event {
-    if (!secret) {
-      throw new Error('Webhook secret is not defined');
-    }
-
     try {
-      return this.stripe.webhooks.constructEvent(payload, signature, secret);
+      return this.stripe.webhooks.constructEvent(payload, signature, this.endpointSecret);
     } catch (err) {
       console.error('Webhook verification failed:', err.message);
       throw new Error('Invalid webhook signature');

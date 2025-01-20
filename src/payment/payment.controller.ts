@@ -27,15 +27,14 @@ export class PaymentController {
     return await this.paymentService.createPaymentIntent(amount, currency);
   }
 
-  @Post('webhooks')
+  @Post('webhook')
   async handleWebhook(@Req() req: Request, @Res() res: Response) {
     const sig = req.headers['stripe-signature'];
-    const endpointSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
 
     let event;
 
     try {
-      event = this.paymentService.verifyWebhookSignature(req.body, sig, endpointSecret);
+      event = this.paymentService.verifyWebhookSignature(req.body, sig);
     } catch (err) {
       return res.status(400).send(`Webhook signature verification failed: ${err.message}`);
     }

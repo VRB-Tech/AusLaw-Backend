@@ -80,10 +80,10 @@ export class AuthService {
       if (isDoyles) {
         const priceId = role === 'user' ? 'price_monthly' : 'price_annual';
 
-        const customer = await this.paymentService.createCustomer(email, 'pm_card_visa');
-        const subscription = await this.paymentService.createSubscription(customer.id, priceId);
+        // const customer = await this.paymentService.createCustomer(email, 'pm_card_visa');
+        // const subscription = await this.paymentService.createSubscription(customer.id, priceId);
 
-        await this.usersService.updatePaymentStatus(newUser.id, 'pending', subscription.id);
+        await this.usersService.updatePaymentStatus(newUser.id, 'pending', 'subscription.id');
 
         return {
           id: newUser.id,
@@ -92,7 +92,7 @@ export class AuthService {
           lastName: newUser.lastName,
           isDoyles: newUser.isDoyles,
           role: newUser.role,
-          subscriptionId: subscription.id,
+          subscriptionId: 'subscription.id',
         };
       }
 
@@ -159,13 +159,13 @@ export class AuthService {
       if (isDoyles) {
         const priceId = 'price_annual';
 
-        const customer = await this.paymentService.createCustomer(email, 'pm_card_visa');
-        const subscription = await this.paymentService.createSubscription(customer.id, priceId);
+        // const customer = await this.paymentService.createCustomer(email, 'pm_card_visa');
+        // const subscription = await this.paymentService.createSubscription(customer.id, priceId);
 
         await this.organisationsService.updatePaymentStatus(
           newOrganisation.id,
           'pending',
-          subscription.id,
+          'subscription.id',
         );
 
         return {
@@ -173,7 +173,7 @@ export class AuthService {
           email: newOrganisation.email,
           name: newOrganisation.name,
           isDoyles: newOrganisation.isDoyles,
-          subscriptionId: subscription.id,
+          subscriptionId: 'subscription.id',
         };
       }
 
