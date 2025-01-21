@@ -286,11 +286,9 @@ export class AuthService {
         throw new UnauthorizedException('Invalid or expired reset token.');
       }
 
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-
       user
-        ? await this.usersService.updatePassword(user.id, hashedPassword)
-        : await this.organisationsService.updatePassword(organisation.id, hashedPassword);
+        ? await this.usersService.updatePassword(account.id, newPassword)
+        : await this.organisationsService.updatePassword(account.id, newPassword);
     } catch (err) {
       throw new UnauthorizedException('Invalid or expired reset token.');
     }
