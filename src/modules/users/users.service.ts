@@ -87,7 +87,7 @@ export class UsersService {
     paymentStatus: string,
     paymentIntentId: string,
   ): Promise<void> {
-    await this.userModel.update({ paymentStatus, paymentIntentId }, { where: { id: userId } });
+    await this.userModel.update({ paymentStatus }, { where: { id: userId } });
   }
 
   async updatePassword(userId: number, newPassword: string): Promise<string> {
