@@ -175,6 +175,10 @@ export class AuthService {
     const accessToken = this.jwtService.sign(payload, { expiresIn: '14d' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '30d' });
 
+    'role' in account
+      ? this.usersService.updateRefreshToken(account.id, refreshToken)
+      : this.organisationsService.updateRefreshToken(account.id, refreshToken);
+
     return {
       accessToken,
       refreshToken,
