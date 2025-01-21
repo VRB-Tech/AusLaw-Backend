@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Agent } from 'https';
-import Stripe from 'stripe';
+import { Stripe } from 'stripe';
 
 @Global()
 @Module({
