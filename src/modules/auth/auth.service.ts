@@ -235,7 +235,7 @@ export class AuthService {
       { expiresIn: '1h' },
     );
 
-    const resetLink = `http://localhost:3000/en/reset-password?token=${resetToken}`;
+    const resetLink = `http://localhost:3000/en/reset-password/confirm?token=${resetToken}`;
 
     await this.mailerService.sendMail({
       to: email,

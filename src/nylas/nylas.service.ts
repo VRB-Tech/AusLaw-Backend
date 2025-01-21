@@ -75,7 +75,7 @@ export class NylasService {
   async getAllEventsFromCalendar(calendarId: string, grantId: string) {
     try {
       const now = startOfDay(new Date());
-      const threeMonthsLater = addMonths(now, 3);
+      const threeMonthsLater = addMonths(now, 12);
 
       const events = await this.nylas.events.list({
         identifier: grantId,
