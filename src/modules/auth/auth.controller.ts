@@ -115,6 +115,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Query('token') token: string, @Body('newPassword') newPassword: string) {
     await this.authService.resetPassword(token, newPassword);
+
     return { message: 'Password has been reset successfully' };
   }
 }
