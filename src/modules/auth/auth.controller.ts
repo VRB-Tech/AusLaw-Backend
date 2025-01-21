@@ -91,40 +91,27 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(
-    @Body('refreshToken') refreshToken: string,
-    @Body('type') type: 'user' | 'organisation',
-  ) {
-    if (!type || !['user', 'organisation'].includes(type)) {
-      throw new BadRequestException('Invalid or missing account type');
+  async refresh(@Body('refreshToken') refreshToken: string, @Body('email') email: string) {
+    if (!email || !refreshToken) {
+      throw new BadRequestException('Invalid or missing request parameters');
     }
 
-    return type === 'user'
-      ? this.authService.refreshTokenForUser(refreshToken)
-      : this.authService.refreshTokenForOrganisation(refreshToken);
+    return this.authService.refreshToken(email, refreshToken);
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
-  async logout(@Body('id') id: number, @Body('type') type: 'user' | 'organisation') {
-    if (!type || !['user', 'organisation'].includes(type)) {
-      throw new BadRequestException('Invalid or missing account type');
-    }
+  async logout(@Body('email') email: string) {
+    await this.authService.logoutAccount(email);
 
-    type === 'user'
-      ? await this.authService.logoutUser(id)
-      : await this.authService.logoutOrganisation(id);
-
-    return { message: `${type === 'user' ? 'User' : 'Organisation'} logged out successfully` };
+    return { message: `Account logged out successfully` };
   }
 
   @Post('request-password-reset')
   @HttpCode(HttpStatus.OK)
-  async requestPasswordReset(
-    @Body() { email, type }: { email: string; type: 'user' | 'organisation' },
-  ) {
-    await this.authService.requestPasswordReset(email, type);
+  async requestPasswordReset(@Body() { email }: { email: string }) {
+    await this.authService.requestPasswordReset(email);
 
     return { message: 'Password reset link sent successfully' };
   }

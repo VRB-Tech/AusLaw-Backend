@@ -32,9 +32,10 @@ export class AuthService {
     }
 
     const existingUser = await this.usersService.findByEmail(email);
+    const existingOrganisation = await this.organisationsService.findByEmail(email);
 
-    if (existingUser) {
-      throw new ConflictException('User already exists');
+    if (existingUser || existingOrganisation) {
+      throw new ConflictException('Account already exists');
     }
 
     const registrationToken = this.jwtService.sign(
@@ -91,9 +92,10 @@ export class AuthService {
   async registerOrganisation(authDto: OrganisationRegisterDto): Promise<void> {
     const { email, name, isDoyles, password } = authDto;
 
+    const existingUser = await this.usersService.findByEmail(email);
     const existingOrganisation = await this.organisationsService.findByEmail(email);
 
-    if (existingOrganisation) {
+    if (existingOrganisation || existingUser) {
       throw new ConflictException('Organisation already exists');
     }
 
@@ -179,28 +181,35 @@ export class AuthService {
     };
   }
 
-  async refreshTokenForUser(
+  async refreshToken(
+    email: string,
     refreshToken: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       const decoded = this.jwtService.verify(refreshToken);
 
-      const user = await this.usersService.findById(decoded.subject);
+      const account =
+        (await this.usersService.findByEmail(email)) ||
+        (await this.organisationsService.findByEmail(email));
 
-      if (!user.refreshToken || !(await bcrypt.compare(refreshToken, user.refreshToken))) {
+      if (!account.refreshToken || !(await bcrypt.compare(refreshToken, account.refreshToken))) {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
       const payload: JwtPayload = {
-        email: user.email,
-        subject: user,
-        role: user.role,
+        email: account.email,
+        subject: account,
+        role: 'role' in account ? account.role : 'organisation',
       };
 
       const newAccessToken = this.jwtService.sign(payload, { expiresIn: '14d' });
       const newRefreshToken = this.jwtService.sign(payload, { expiresIn: '30d' });
 
-      await this.usersService.updateRefreshToken(user.id, newRefreshToken);
+      if ('id' in account) {
+        await (
+          'role' in account ? this.usersService : this.organisationsService
+        ).updateRefreshToken(account.id, newRefreshToken);
+      }
 
       return {
         accessToken: newAccessToken,
@@ -211,45 +220,10 @@ export class AuthService {
     }
   }
 
-  async refreshTokenForOrganisation(
-    refreshToken: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    try {
-      const decoded = this.jwtService.verify(refreshToken);
-
-      const organisation = await this.organisationsService.findById(decoded.subject);
-
-      if (
-        !organisation.refreshToken ||
-        !(await bcrypt.compare(refreshToken, organisation.refreshToken))
-      ) {
-        throw new UnauthorizedException('Invalid refresh token');
-      }
-
-      const payload: JwtPayload = {
-        email: organisation.email,
-        subject: organisation,
-      };
-
-      const newAccessToken = this.jwtService.sign(payload, { expiresIn: '14d' });
-      const newRefreshToken = this.jwtService.sign(payload, { expiresIn: '30d' });
-
-      await this.organisationsService.updateRefreshToken(organisation.id, newRefreshToken);
-
-      return {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      };
-    } catch (err) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-  }
-
-  async requestPasswordReset(email: string, type: 'user' | 'organisation'): Promise<void> {
+  async requestPasswordReset(email: string): Promise<void> {
     const account =
-      type === 'user'
-        ? await this.usersService.findByEmail(email)
-        : await this.organisationsService.findByEmail(email);
+      (await this.usersService.findByEmail(email)) ||
+      (await this.organisationsService.findByEmail(email));
 
     if (!account) {
       throw new NotFoundException('Account with this email does not exist.');
@@ -298,12 +272,12 @@ export class AuthService {
     }
   }
 
-  async logoutUser(userId: number): Promise<void> {
-    await this.usersService.updateRefreshToken(userId, null);
-  }
+  async logoutAccount(email: string): Promise<void> {
+    const account =
+      (await this.usersService.findByEmail(email)) ||
+      (await this.organisationsService.findByEmail(email));
 
-  async logoutOrganisation(organisationId: number): Promise<void> {
-    await this.organisationsService.updateRefreshToken(organisationId, null);
+    await this.usersService.updateRefreshToken(account.id, null);
   }
 
   async registerUserByGoogle(profile: {
