@@ -18,7 +18,6 @@ import { MessageStatus } from './modules/messages/entities/MessageStatus.model';
 import { Message } from './modules/messages/messages.model';
 import { MessagesModule } from './modules/messages/messages.module';
 import { OrganisationsModule } from './modules/organisations/organisations.module';
-import { PaymentModule } from './modules/payment/payment.module';
 import { Post } from './modules/posts/posts.model';
 import { PostsModule } from './modules/posts/posts.module';
 import { User } from './modules/users/users.model';
@@ -30,7 +29,6 @@ import { NylasModule } from './nylas/nylas.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    PaymentModule,
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

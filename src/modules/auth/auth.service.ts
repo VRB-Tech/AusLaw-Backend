@@ -9,7 +9,6 @@ import * as bcrypt from 'bcrypt';
 import { MailerService } from 'src/mailer/mail.service';
 import { OrganisationResponseDto } from '../organisations/dto/organisationResponse.dto';
 import { OrganisationsService } from '../organisations/organisations.service';
-import { PaymentService } from '../payment/payment.service';
 import { UserResponseDto } from '../users/dto/userResponse.dto';
 import { UsersService } from '../users/users.service';
 import { loginDto } from './dto/login.dto';
@@ -23,7 +22,6 @@ export class AuthService {
     private readonly organisationsService: OrganisationsService,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
-    private readonly paymentService: PaymentService,
   ) {}
 
   async registerUser(authDto: UserRegisterDto): Promise<void> {
@@ -76,25 +74,6 @@ export class AuthService {
         isDoyles,
         role,
       });
-
-      if (isDoyles) {
-        const priceId = role === 'user' ? 'price_monthly' : 'price_annual';
-
-        const customer = await this.paymentService.createCustomer(email, 'pm_card_visa');
-        const subscription = await this.paymentService.createSubscription(customer.id, priceId);
-
-        await this.usersService.updatePaymentStatus(newUser.id, 'pending', subscription.id);
-
-        return {
-          id: newUser.id,
-          email: newUser.email,
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-          isDoyles: newUser.isDoyles,
-          role: newUser.role,
-          subscriptionId: subscription.id,
-        };
-      }
 
       return {
         id: newUser.id,
@@ -156,27 +135,6 @@ export class AuthService {
         isDoyles,
       });
 
-      if (isDoyles) {
-        const priceId = 'price_annual';
-
-        const customer = await this.paymentService.createCustomer(email, 'pm_card_visa');
-        const subscription = await this.paymentService.createSubscription(customer.id, priceId);
-
-        await this.organisationsService.updatePaymentStatus(
-          newOrganisation.id,
-          'pending',
-          subscription.id,
-        );
-
-        return {
-          id: newOrganisation.id,
-          email: newOrganisation.email,
-          name: newOrganisation.name,
-          isDoyles: newOrganisation.isDoyles,
-          subscriptionId: subscription.id,
-        };
-      }
-
       return {
         id: newOrganisation.id,
         email: newOrganisation.email,
@@ -193,18 +151,15 @@ export class AuthService {
   ): Promise<
     { accessToken: string; refreshToken: string } | { accessToken: string; refreshToken: string }
   > {
-    const { email, password, type } = loginDto;
+    const { email, password } = loginDto;
 
     const account =
-      type === 'user'
-        ? await this.usersService.findByEmail(email)
-        : await this.organisationsService.findByEmail(email);
+      (await this.usersService.findByEmail(email)) ||
+      (await this.organisationsService.findByEmail(email));
 
     if (!account) {
       throw new UnauthorizedException('Account does not exist');
     }
-
-    console.log(account);
 
     if (!(await bcrypt.compare(password, account.password))) {
       throw new UnauthorizedException('Invalid credentials');
