@@ -181,16 +181,13 @@ export class AuthService {
     };
   }
 
-  async refreshToken(
-    email: string,
-    refreshToken: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       const decoded = this.jwtService.verify(refreshToken);
 
       const account =
-        (await this.usersService.findByEmail(email)) ||
-        (await this.organisationsService.findByEmail(email));
+        (await this.usersService.findByEmail(decoded.subject.email)) ||
+        (await this.organisationsService.findByEmail(decoded.subject.email));
 
       if (!account.refreshToken || !(await bcrypt.compare(refreshToken, account.refreshToken))) {
         throw new UnauthorizedException('Invalid refresh token');

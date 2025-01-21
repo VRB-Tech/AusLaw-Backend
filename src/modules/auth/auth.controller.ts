@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -91,12 +90,8 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(@Body('refreshToken') refreshToken: string, @Body('email') email: string) {
-    if (!email || !refreshToken) {
-      throw new BadRequestException('Invalid or missing request parameters');
-    }
-
-    return this.authService.refreshToken(email, refreshToken);
+  async refresh(@Body('refreshToken') refreshToken: string) {
+    return this.authService.refreshToken(refreshToken);
   }
 
   @Post('logout')
