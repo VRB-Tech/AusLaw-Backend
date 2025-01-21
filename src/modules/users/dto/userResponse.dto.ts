@@ -22,7 +22,4 @@ export class UserResponseDto {
 
   @IsString()
   paymentLink?: string;
-
-  @IsString()
-  subscriptionId?: string;
 }

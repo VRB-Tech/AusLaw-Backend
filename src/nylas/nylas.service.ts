@@ -83,6 +83,7 @@ export class NylasService {
           calendarId: calendarId,
           start: now.toISOString(),
           end: threeMonthsLater.toISOString(),
+          limit: 200,
         },
       });
 

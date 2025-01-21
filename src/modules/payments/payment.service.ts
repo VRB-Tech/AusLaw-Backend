@@ -21,27 +21,49 @@ export class PaymentService implements OnModuleInit {
     });
   }
 
-  async createPaymentIntent(amount: number, currency: string, metadata?: Record<string, string>) {
+  async createTrialSubscriptionPaymentLink(
+    subscriptionType: 'monthly' | 'quarterly' | 'yearly',
+  ): Promise<string> {
     try {
-      const paymentIntent = await this.stripe.paymentIntents.create({
-        amount,
-        currency,
-        metadata,
+      const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
+
+      if (!priceId) {
+        throw new Error(`Price ID for subscription type ${subscriptionType} is not configured`);
+      }
+
+      const session = await this.stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'subscription',
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        subscription_data: {
+          trial_period_days: 14,
+        },
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/success`,
+        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/cancel`,
       });
-      return paymentIntent;
+
+      return session.url;
     } catch (error) {
-      this.logger.error('Error creating payment intent', error);
+      this.logger.error(
+        `Error creating trial subscription payment link for ${subscriptionType}`,
+        error,
+      );
       throw error;
     }
   }
 
-  async getPaymentIntent(paymentIntentId: string) {
-    try {
-      return await this.stripe.paymentIntents.retrieve(paymentIntentId);
-    } catch (error) {
-      this.logger.error('Error retrieving payment intent', error);
-      throw error;
-    }
+  private getPriceIdBySubscriptionType(subscriptionType: string): string {
+    const priceMap = {
+      monthly: this.configService.get<string>('STRIPE_MONTHLY_PRICE_ID'),
+      quarterly: this.configService.get<string>('STRIPE_QUARTERLY_PRICE_ID'),
+      yearly: this.configService.get<string>('STRIPE_YEARLY_PRICE_ID'),
+    };
+    return priceMap[subscriptionType];
   }
 
   async handleWebhook(eventPayload: Buffer, stripeSignature: string) {
