@@ -68,4 +68,8 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   customerStripeId?: string;
+
+  @IsString()
+  @IsOptional()
+  checkoutSessionId?: string;
 }

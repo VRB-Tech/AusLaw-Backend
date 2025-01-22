@@ -52,15 +52,9 @@ export class PaymentService implements OnModuleInit {
         cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/cancel`,
       });
 
-      console.log('Session ID:', session.id);
-      console.log('Session URL:', session.url);
-      console.log('Subscription ID:', session.subscription);
-      console.log('Customer ID:', session.customer);
-
       await this.userService.update(userId, {
-        subscriptionId: session.subscription as string,
+        checkoutSessionId: session.id,
         paymentStatus: 'pending',
-        customerStripeId: session.customer as string,
       });
 
       return session.url;
@@ -120,6 +114,22 @@ export class PaymentService implements OnModuleInit {
       );
 
       switch (event.type) {
+        case 'checkout.session.completed':
+          const session = event.data.object as Stripe.Checkout.Session;
+          const user = await this.userService.findByCheckoutSessionId(session.id as string);
+
+          if (user) {
+            await this.userService.update(user.id.toString(), {
+              paymentStatus: 'active',
+              customerStripeId: session.customer as string,
+            });
+            this.logger.log(`Payment completed for user ID: ${user.id}`);
+          } else {
+            this.logger.warn(`No user found for checkout session ID: ${session.id}`);
+          }
+
+          break;
+
         case 'customer.subscription.created': {
           const subscription = event.data.object as Stripe.Subscription;
           const user = await this.userService.findByStripeCustomerId(
@@ -133,38 +143,6 @@ export class PaymentService implements OnModuleInit {
             );
           } else {
             this.logger.warn(`No user found for subscription ID: ${subscription.id}`);
-          }
-          break;
-        }
-
-        case 'payment_intent.succeeded': {
-          const paymentIntent = event.data.object as Stripe.PaymentIntent;
-          const user = await this.userService.findBySubscriptionId(paymentIntent.id);
-
-          if (user) {
-            await this.userService.update(user.id.toString(), { paymentStatus: 'active' });
-            this.logger.log(
-              `PaymentIntent succeeded. Updated status to active for user ID: ${user.id}`,
-            );
-          } else {
-            this.logger.warn(`No user found for PaymentIntent ID: ${paymentIntent.id}`);
-          }
-          break;
-        }
-
-        case 'payment_intent.payment_failed': {
-          const paymentIntentFailed = event.data.object as Stripe.PaymentIntent;
-          const user = await this.userService.findBySubscriptionId(paymentIntentFailed.id);
-
-          if (user) {
-            await this.userService.update(user.id.toString(), { paymentStatus: 'failed' });
-            this.logger.warn(
-              `PaymentIntent failed. Updated status to failed for user ID: ${user.id}`,
-            );
-          } else {
-            this.logger.warn(
-              `No user found for failed PaymentIntent ID: ${paymentIntentFailed.id}`,
-            );
           }
           break;
         }

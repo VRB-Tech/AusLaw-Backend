@@ -86,6 +86,12 @@ export class User extends Model<User> {
     type: DataType.STRING,
     allowNull: true,
   })
+  checkoutSessionId: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
   customerStripeId: string;
 
   @Column({
