@@ -88,6 +88,12 @@ export class User extends Model<User> {
   })
   paymentStatus: string;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  subscriptionId: string;
+
   @Column(DataType.STRING)
   grantId: string;
 

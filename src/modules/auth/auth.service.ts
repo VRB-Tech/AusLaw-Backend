@@ -71,11 +71,6 @@ export class AuthService {
 
       let paymentLink: string = null;
 
-      if (role === 'individual') {
-        paymentLink =
-          await this.paymentService.createTrialSubscriptionPaymentLink(subscriptionType);
-      }
-
       const newUser = await this.usersService.create({
         email,
         firstName,
@@ -84,6 +79,13 @@ export class AuthService {
         isDoyles,
         role,
       });
+
+      if (role === 'individual') {
+        paymentLink = await this.paymentService.createTrialSubscriptionPaymentLink(
+          subscriptionType,
+          newUser.id.toString(),
+        );
+      }
 
       return role !== 'individual'
         ? {
@@ -156,8 +158,10 @@ export class AuthService {
         isDoyles,
       });
 
-      const paymentLink =
-        await this.paymentService.createTrialSubscriptionPaymentLink(subscriptionType);
+      const paymentLink = await this.paymentService.createTrialSubscriptionPaymentLink(
+        subscriptionType,
+        newOrganisation.id.toString(),
+      );
 
       return {
         id: newOrganisation.id,

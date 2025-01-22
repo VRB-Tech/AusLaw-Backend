@@ -56,4 +56,12 @@ export class CreateUserDto {
 
   @IsEnum({ message: 'Role must be a valid UserRole' })
   role?: UserRole;
+
+  @IsString()
+  @IsOptional()
+  paymentStatus?: string;
+
+  @IsString()
+  @IsOptional()
+  subscriptionId?: string;
 }

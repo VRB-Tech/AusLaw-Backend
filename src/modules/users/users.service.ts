@@ -54,47 +54,8 @@ export class UsersService {
     return this.userModel.findOne({ where: { email } });
   }
 
-  async update(id: string, updateUserDto: Partial<CreateUserDto>): Promise<User> {
-    const user = await this.findOne(id);
-
-    if (updateUserDto.password) {
-      updateUserDto.password = await this.updatePassword(user.id, updateUserDto.password);
-    }
-
-    return user.update(updateUserDto);
-  }
-
-  async remove(id: string): Promise<{ message: string }> {
-    const user = await this.findOne(id);
-
-    if (!user) {
-      throw new NotFoundException(`User with ID: '${id}' not found`);
-    }
-
-    await user.destroy();
-    return { message: `User with ID ${id} was removed successfully.` };
-  }
-
-  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<string> {
-    const hashedToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
-    await this.userModel.update({ refreshToken: hashedToken }, { where: { id: userId } });
-
-    return refreshToken;
-  }
-
-  async updatePaymentStatus(
-    userId: number,
-    paymentStatus: string,
-    paymentIntentId: string,
-  ): Promise<void> {
-    await this.userModel.update({ paymentStatus }, { where: { id: userId } });
-  }
-
-  async updatePassword(userId: number, newPassword: string): Promise<string> {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.userModel.update({ password: hashedPassword }, { where: { id: userId } });
-
-    return hashedPassword;
+  async findBySubscriptionId(subscriptionId: string): Promise<User> {
+    return this.userModel.findOne({ where: { subscriptionId } });
   }
 
   async getUsersByQuery(filters: {
@@ -125,5 +86,44 @@ export class UsersService {
     return this.userModel.findAll({
       where: whereClause,
     });
+  }
+
+  async update(id: string, updateUserDto: Partial<CreateUserDto>): Promise<User> {
+    const user = await this.userModel.findByPk(id);
+
+    if (updateUserDto.password) {
+      updateUserDto.password = await this.updatePassword(user.id, updateUserDto.password);
+    }
+
+    return user.update(updateUserDto);
+  }
+
+  async updatePaymentStatus(userId: number, paymentStatus: string): Promise<void> {
+    await this.userModel.update({ paymentStatus }, { where: { id: userId } });
+  }
+
+  async updatePassword(userId: number, newPassword: string): Promise<string> {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.userModel.update({ password: hashedPassword }, { where: { id: userId } });
+
+    return hashedPassword;
+  }
+
+  async remove(id: string): Promise<{ message: string }> {
+    const user = await this.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with ID: '${id}' not found`);
+    }
+
+    await user.destroy();
+    return { message: `User with ID ${id} was removed successfully.` };
+  }
+
+  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<string> {
+    const hashedToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
+    await this.userModel.update({ refreshToken: hashedToken }, { where: { id: userId } });
+
+    return refreshToken;
   }
 }
