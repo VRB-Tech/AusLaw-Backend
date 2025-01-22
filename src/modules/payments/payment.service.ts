@@ -54,7 +54,7 @@ export class PaymentService implements OnModuleInit {
 
       await this.userService.update(userId, {
         subscriptionId: session.subscription as string,
-        paymentStatus: 'active',
+        paymentStatus: 'pending',
       });
 
       return session.url;
@@ -81,8 +81,12 @@ export class PaymentService implements OnModuleInit {
     try {
       const user = await this.userService.findById(userId);
 
-      if (!user || !user.subscriptionId) {
-        throw new Error('User or subscription not found');
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      if (!user.subscriptionId) {
+        throw new Error('User does not have an active subscription');
       }
 
       await this.stripe.subscriptions.cancel(user.subscriptionId);
@@ -110,57 +114,61 @@ export class PaymentService implements OnModuleInit {
       );
 
       switch (event.type) {
-        case 'payment_intent.succeeded':
+        case 'payment_intent.succeeded': {
           const paymentIntent = event.data.object as Stripe.PaymentIntent;
-          const userSuccess = await this.userService.findBySubscriptionId(
-            paymentIntent.id as string,
-          );
+          const user = await this.userService.findBySubscriptionId(paymentIntent.id);
 
-          if (userSuccess) {
-            await this.userService.update(userSuccess.id.toString(), { paymentStatus: 'active' });
+          if (user) {
+            await this.userService.update(user.id.toString(), { paymentStatus: 'active' });
             this.logger.log(
-              `PaymentIntent succeeded. Updated status to active for user ID: ${userSuccess.id}`,
+              `PaymentIntent succeeded. Updated status to active for user ID: ${user.id}`,
             );
+          } else {
+            this.logger.warn(`No user found for PaymentIntent ID: ${paymentIntent.id}`);
           }
-
           break;
+        }
 
-        case 'payment_intent.payment_failed':
+        case 'payment_intent.payment_failed': {
           const paymentIntentFailed = event.data.object as Stripe.PaymentIntent;
-          const userFailed = await this.userService.findBySubscriptionId(
-            paymentIntentFailed.id as string,
-          );
+          const user = await this.userService.findBySubscriptionId(paymentIntentFailed.id);
 
-          if (userFailed) {
-            await this.userService.update(userFailed.id.toString(), { paymentStatus: 'failed' });
+          if (user) {
+            await this.userService.update(user.id.toString(), { paymentStatus: 'failed' });
             this.logger.warn(
-              `PaymentIntent failed. Updated status to failed for user ID: ${userFailed.id}`,
+              `PaymentIntent failed. Updated status to failed for user ID: ${user.id}`,
+            );
+          } else {
+            this.logger.warn(
+              `No user found for failed PaymentIntent ID: ${paymentIntentFailed.id}`,
             );
           }
-
           break;
+        }
 
-        case 'customer.subscription.deleted':
+        case 'customer.subscription.deleted': {
           const subscription = event.data.object as Stripe.Subscription;
-          const userCanceled = await this.userService.findBySubscriptionId(subscription.id);
+          const user = await this.userService.findBySubscriptionId(subscription.id);
 
-          if (userCanceled) {
-            await this.userService.update(userCanceled.id.toString(), {
-              paymentStatus: 'canceled',
-            });
-            this.logger.log(`Subscription canceled for user ID: ${userCanceled.id}`);
+          if (user) {
+            await this.userService.update(user.id.toString(), { paymentStatus: 'canceled' });
+            this.logger.log(
+              `Subscription canceled. Updated status to canceled for user ID: ${user.id}`,
+            );
+          } else {
+            this.logger.warn(`No user found for subscription ID: ${subscription.id}`);
           }
-
           break;
+        }
 
         default:
-          this.logger.debug(`New event type: ${event.type}`);
+          this.logger.debug(`Unhandled event type: ${event.type}`);
       }
 
-      return event;
+      return { received: true };
     } catch (error) {
-      this.logger.error('Error handling webhook', error);
-      throw error;
+      this.logger.error(`Error handling webhook event: ${error.message}`, error);
+      throw new Error(`Webhook handling failed: ${error.message}`);
     }
   }
 }
