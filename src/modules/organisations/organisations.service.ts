@@ -15,7 +15,7 @@ export class OrganisationsService {
     return this.organisationModel.findOne({ where: { email } });
   }
 
-  async findById(id: string): Promise<Organisation | null> {
+  async findById(id: number): Promise<Organisation | null> {
     return this.organisationModel.findByPk(id);
   }
 
@@ -32,15 +32,18 @@ export class OrganisationsService {
     });
   }
 
-  async updatePaymentStatus(
-    organisationId: number,
-    paymentStatus: string,
-    paymentIntentId: string,
-  ): Promise<void> {
-    await this.organisationModel.update(
-      { paymentStatus, paymentIntentId },
-      { where: { id: organisationId } },
-    );
+  async updatePaymentStatus(organisationId: number, paymentStatus: string): Promise<void> {
+    await this.organisationModel.update({ paymentStatus }, { where: { id: organisationId } });
+  }
+
+  async update(id: string, updateUserDto: Partial<CreateOrganisationDto>): Promise<Organisation> {
+    const user = await this.organisationModel.findByPk(id);
+
+    if (updateUserDto.password) {
+      updateUserDto.password = await this.updatePassword(user.id, updateUserDto.password);
+    }
+
+    return user.update(updateUserDto);
   }
 
   async updateRefreshToken(id: number, refreshToken: string | null): Promise<void> {

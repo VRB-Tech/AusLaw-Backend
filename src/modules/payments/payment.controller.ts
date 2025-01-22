@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Param, Post, Req, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Param, Post, Req, Res } from '@nestjs/common';
 import { Request } from 'express';
 import { PaymentService } from './payment.service';
 
@@ -6,13 +6,61 @@ import { PaymentService } from './payment.service';
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
+  @Post('create/user/:userId')
+  async createUserSubscription(
+    @Param('userId') userId: number,
+    @Body('subscriptionType') subscriptionType: 'monthly' | 'quarterly' | 'yearly',
+  ) {
+    try {
+      const paymentLink = await this.paymentService.createTrialSubscriptionPaymentLinkForUser(
+        userId,
+        subscriptionType,
+      );
+
+      return { paymentLink };
+    } catch (error) {
+      return { error: `Failed to create subscription for user ${userId}: ${error.message}` };
+    }
+  }
+  @Post('create/organisation/:organisationId')
+  async createOrganisationSubscription(
+    @Param('organisationId') organisationId: number,
+    @Body('subscriptionType') subscriptionType: 'monthly' | 'quarterly' | 'yearly',
+  ) {
+    try {
+      const paymentLink =
+        await this.paymentService.createTrialSubscriptionPaymentLinkForOrganisation(
+          organisationId,
+          subscriptionType,
+        );
+
+      return { paymentLink };
+    } catch (error) {
+      return {
+        error: `Failed to create subscription for user ${organisationId}: ${error.message}`,
+      };
+    }
+  }
+
   @Post('cancel/:userId')
-  async cancelSubscription(@Param('userId') userId: number) {
+  async cancelSubscriptionForUser(@Param('userId') userId: number) {
     try {
       await this.paymentService.cancelSubscription(userId);
       return { message: `Subscription for user ${userId} has been canceled.` };
     } catch (error) {
       return { error: `Failed to cancel subscription for user ${userId}: ${error.message}` };
+    }
+  }
+
+  @Post('cancel/:organisationId')
+  async cancelSubscriptionForOrganisation(@Param('organisationId') organisationId: number) {
+    try {
+      await this.paymentService.cancelSubscriptionForOrganisation(organisationId);
+      return { message: `Subscription for user ${organisationId} has been canceled.` };
+    } catch (error) {
+      return {
+        error: `Failed to cancel subscription for user ${organisationId}: ${error.message}`,
+      };
     }
   }
 

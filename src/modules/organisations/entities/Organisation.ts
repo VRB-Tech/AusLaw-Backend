@@ -52,11 +52,23 @@ export class Organisation extends Model<Organisation> {
     type: DataType.STRING,
     allowNull: true,
   })
+  checkoutSessionId: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  customerStripeId: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
   paymentStatus: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
-  paymentIntentId: string;
+  subscriptionId: string;
 }

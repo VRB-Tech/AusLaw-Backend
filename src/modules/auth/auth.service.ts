@@ -9,7 +9,6 @@ import * as bcrypt from 'bcrypt';
 import { MailerService } from 'src/mailer/mail.service';
 import { OrganisationResponseDto } from '../organisations/dto/organisationResponse.dto';
 import { OrganisationsService } from '../organisations/organisations.service';
-import { PaymentService } from '../payments/payment.service';
 import { UserResponseDto } from '../users/dto/userResponse.dto';
 import { UsersService } from '../users/users.service';
 import { loginDto } from './dto/login.dto';
@@ -23,11 +22,10 @@ export class AuthService {
     private readonly organisationsService: OrganisationsService,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
-    private readonly paymentService: PaymentService,
   ) {}
 
   async registerUser(authDto: UserRegisterDto): Promise<void> {
-    const { isDoyles, email, firstName, lastName, role, password, subscriptionType } = authDto;
+    const { isDoyles, email, firstName, lastName, role, password } = authDto;
 
     if (role !== 'user' && role !== 'individual') {
       throw new UnauthorizedException('Invalid user role');
@@ -41,7 +39,7 @@ export class AuthService {
     }
 
     const registrationToken = this.jwtService.sign(
-      { isDoyles, email, firstName, lastName, role, password, subscriptionType },
+      { isDoyles, email, firstName, lastName, role, password },
       { expiresIn: '1h' },
     );
 
@@ -61,15 +59,13 @@ export class AuthService {
     try {
       const decoded = this.jwtService.verify(registrationToken);
 
-      const { isDoyles, email, firstName, lastName, password, role, subscriptionType } = decoded;
+      const { isDoyles, email, firstName, lastName, password, role } = decoded;
 
       const existingUser = await this.usersService.findByEmail(email);
 
       if (existingUser) {
         throw new ConflictException('User already exists');
       }
-
-      let paymentLink: string = null;
 
       const newUser = await this.usersService.create({
         email,
@@ -80,38 +76,21 @@ export class AuthService {
         role,
       });
 
-      if (role === 'individual') {
-        paymentLink = await this.paymentService.createTrialSubscriptionPaymentLink(
-          subscriptionType,
-          newUser.id.toString(),
-        );
-      }
-
-      return role !== 'individual'
-        ? {
-            id: newUser.id,
-            email: newUser.email,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-            isDoyles: newUser.isDoyles,
-            role: newUser.role,
-          }
-        : {
-            id: newUser.id,
-            email: newUser.email,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-            isDoyles: newUser.isDoyles,
-            role: newUser.role,
-            paymentLink,
-          };
+      return {
+        id: newUser.id,
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        isDoyles: newUser.isDoyles,
+        role: newUser.role,
+      };
     } catch (err) {
       throw new UnauthorizedException('Invalid or expired registration token');
     }
   }
 
   async registerOrganisation(authDto: OrganisationRegisterDto): Promise<void> {
-    const { email, name, isDoyles, password, subscriptionType } = authDto;
+    const { email, name, isDoyles, password } = authDto;
 
     const existingUser = await this.usersService.findByEmail(email);
     const existingOrganisation = await this.organisationsService.findByEmail(email);
@@ -121,7 +100,7 @@ export class AuthService {
     }
 
     const registrationToken = this.jwtService.sign(
-      { email, name, isDoyles, password, subscriptionType },
+      { email, name, isDoyles, password },
       { expiresIn: '15m' },
     );
 
@@ -143,7 +122,7 @@ export class AuthService {
     try {
       const decoded = this.jwtService.verify(registrationToken);
 
-      const { isDoyles, email, name, password, subscriptionType } = decoded;
+      const { isDoyles, email, name, password } = decoded;
 
       const existingOrganisation = await this.organisationsService.findByEmail(email);
 
@@ -158,17 +137,11 @@ export class AuthService {
         isDoyles,
       });
 
-      const paymentLink = await this.paymentService.createTrialSubscriptionPaymentLink(
-        subscriptionType,
-        newOrganisation.id.toString(),
-      );
-
       return {
         id: newOrganisation.id,
         email: newOrganisation.email,
         name: newOrganisation.name,
         isDoyles: newOrganisation.isDoyles,
-        paymentLink,
       };
     } catch (err) {
       throw new UnauthorizedException('Invalid or expired registration token');

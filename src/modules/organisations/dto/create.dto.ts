@@ -1,4 +1,12 @@
-import { IsBoolean, IsEmail, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateOrganisationDto {
   @IsNotEmpty({ message: 'The organisation name is required.' })
@@ -18,4 +26,20 @@ export class CreateOrganisationDto {
 
   @IsBoolean({ message: 'The isDoyles field must be a boolean.' })
   isDoyles: boolean;
+
+  @IsString()
+  @IsOptional()
+  paymentStatus?: string;
+
+  @IsString()
+  @IsOptional()
+  checkoutSessionId?: string;
+
+  @IsString()
+  @IsOptional()
+  subscriptionId?: string;
+
+  @IsString()
+  @IsOptional()
+  customerStripeId?: string;
 }
