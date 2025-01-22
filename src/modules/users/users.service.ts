@@ -58,6 +58,10 @@ export class UsersService {
     return this.userModel.findOne({ where: { subscriptionId } });
   }
 
+  async findByStripeCustomerId(customerStripeId: string): Promise<User> {
+    return this.userModel.findOne({ where: { customerStripeId } });
+  }
+
   async getUsersByQuery(filters: {
     firstName?: string;
     lastName?: string;

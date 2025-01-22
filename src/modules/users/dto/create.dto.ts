@@ -64,4 +64,8 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   subscriptionId?: string;
+
+  @IsString()
+  @IsOptional()
+  customerStripeId?: string;
 }

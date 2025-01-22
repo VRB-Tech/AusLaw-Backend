@@ -55,6 +55,7 @@ export class PaymentService implements OnModuleInit {
       await this.userService.update(userId, {
         subscriptionId: session.subscription as string,
         paymentStatus: 'pending',
+        customerStripeId: session.customer as string,
       });
 
       return session.url;
@@ -114,6 +115,23 @@ export class PaymentService implements OnModuleInit {
       );
 
       switch (event.type) {
+        case 'customer.subscription.created': {
+          const subscription = event.data.object as Stripe.Subscription;
+          const user = await this.userService.findByStripeCustomerId(
+            subscription.customer as string,
+          );
+
+          if (user) {
+            await this.userService.update(user.id.toString(), { subscriptionId: subscription.id });
+            this.logger.log(
+              `Subscription canceled. Updated status to canceled for user ID: ${user.id}`,
+            );
+          } else {
+            this.logger.warn(`No user found for subscription ID: ${subscription.id}`);
+          }
+          break;
+        }
+
         case 'payment_intent.succeeded': {
           const paymentIntent = event.data.object as Stripe.PaymentIntent;
           const user = await this.userService.findBySubscriptionId(paymentIntent.id);
@@ -151,7 +169,10 @@ export class PaymentService implements OnModuleInit {
           const user = await this.userService.findBySubscriptionId(subscription.id);
 
           if (user) {
-            await this.userService.update(user.id.toString(), { paymentStatus: 'canceled' });
+            await this.userService.update(user.id.toString(), {
+              paymentStatus: 'canceled',
+              subscriptionId: null,
+            });
             this.logger.log(
               `Subscription canceled. Updated status to canceled for user ID: ${user.id}`,
             );
