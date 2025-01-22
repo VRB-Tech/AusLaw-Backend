@@ -4,6 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from 'src/mailer/mail.service';
@@ -22,6 +23,7 @@ export class AuthService {
     private readonly organisationsService: OrganisationsService,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
   ) {}
 
   async registerUser(authDto: UserRegisterDto): Promise<void> {
@@ -43,7 +45,7 @@ export class AuthService {
       { expiresIn: '1h' },
     );
 
-    const redirectUrl = `http://localhost:3000/en/register/confirm?accountType=user&token=${registrationToken}`;
+    const redirectUrl = `${this.configService.get('FRONTEND_URL')}/en/register/confirm?accountType=user&token=${registrationToken}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -96,7 +98,7 @@ export class AuthService {
     const existingOrganisation = await this.organisationsService.findByEmail(email);
 
     if (existingOrganisation || existingUser) {
-      throw new ConflictException('Organisation already exists');
+      throw new ConflictException('Account already exists');
     }
 
     const registrationToken = this.jwtService.sign(
@@ -104,7 +106,7 @@ export class AuthService {
       { expiresIn: '15m' },
     );
 
-    const redirectUrl = `http://localhost:3000/en/register/confirm?accountType=organisation&token=${registrationToken}`;
+    const redirectUrl = `${this.configService.get('FRONTEND_URL')}/en/register/confirm?accountType=organisation&token=${registrationToken}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -154,10 +156,7 @@ export class AuthService {
     { accessToken: string; refreshToken: string } | { accessToken: string; refreshToken: string }
   > {
     const { email, password } = loginDto;
-
-    const account =
-      (await this.usersService.findByEmail(email)) ||
-      (await this.organisationsService.findByEmail(email));
+    const account = await this.findAccountByEmail(email);
 
     if (!account) {
       throw new UnauthorizedException('Account does not exist');
@@ -188,10 +187,7 @@ export class AuthService {
   async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       const decoded = this.jwtService.verify(refreshToken);
-
-      const account =
-        (await this.usersService.findByEmail(decoded.subject.email)) ||
-        (await this.organisationsService.findByEmail(decoded.subject.email));
+      const account = await this.findAccountByEmail(decoded.subject.email);
 
       if (!account.refreshToken || !(await bcrypt.compare(refreshToken, account.refreshToken))) {
         throw new UnauthorizedException('Invalid refresh token');
@@ -222,9 +218,7 @@ export class AuthService {
   }
 
   async requestPasswordReset(email: string): Promise<void> {
-    const account =
-      (await this.usersService.findByEmail(email)) ||
-      (await this.organisationsService.findByEmail(email));
+    const account = await this.findAccountByEmail(email);
 
     if (!account) {
       throw new NotFoundException('Account with this email does not exist.');
@@ -276,6 +270,10 @@ export class AuthService {
       (await this.usersService.findByEmail(email)) ||
       (await this.organisationsService.findByEmail(email));
 
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
     await this.usersService.updateRefreshToken(account.id, null);
   }
 
@@ -309,5 +307,12 @@ export class AuthService {
       role: newUser.role,
       isDoyles: newUser.isDoyles,
     };
+  }
+
+  private async findAccountByEmail(email: string) {
+    return (
+      (await this.usersService.findByEmail(email)) ||
+      (await this.organisationsService.findByEmail(email))
+    );
   }
 }

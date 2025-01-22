@@ -11,6 +11,10 @@ export class PaymentController {
     @Param('userId') userId: number,
     @Body('subscriptionType') subscriptionType: 'monthly' | 'quarterly' | 'yearly',
   ) {
+    if (!['monthly', 'quarterly', 'yearly'].includes(subscriptionType)) {
+      throw new BadRequestException('Invalid subscription type');
+    }
+
     try {
       const paymentLink = await this.paymentService.createTrialSubscriptionPaymentLinkForUser(
         userId,
@@ -27,6 +31,10 @@ export class PaymentController {
     @Param('organisationId') organisationId: number,
     @Body('subscriptionType') subscriptionType: 'monthly' | 'quarterly' | 'yearly',
   ) {
+    if (!['monthly', 'quarterly', 'yearly'].includes(subscriptionType)) {
+      throw new BadRequestException('Invalid subscription type');
+    }
+
     try {
       const paymentLink =
         await this.paymentService.createTrialSubscriptionPaymentLinkForOrganisation(
@@ -42,24 +50,26 @@ export class PaymentController {
     }
   }
 
-  @Post('cancel/:userId')
+  @Post('cancel/user/:userId')
   async cancelSubscriptionForUser(@Param('userId') userId: number) {
     try {
       await this.paymentService.cancelSubscription(userId);
+
       return { message: `Subscription for user ${userId} has been canceled.` };
     } catch (error) {
       return { error: `Failed to cancel subscription for user ${userId}: ${error.message}` };
     }
   }
 
-  @Post('cancel/:organisationId')
+  @Post('cancel/organisation/:organisationId')
   async cancelSubscriptionForOrganisation(@Param('organisationId') organisationId: number) {
     try {
       await this.paymentService.cancelSubscriptionForOrganisation(organisationId);
-      return { message: `Subscription for user ${organisationId} has been canceled.` };
+
+      return { message: `Subscription for organisation ${organisationId} has been canceled.` };
     } catch (error) {
       return {
-        error: `Failed to cancel subscription for user ${organisationId}: ${error.message}`,
+        error: `Failed to cancel subscription for organisation ${organisationId}: ${error.message}`,
       };
     }
   }
