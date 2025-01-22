@@ -37,11 +37,6 @@ export class BaseAuthDto {
     message: 'The role field cannot be empty.',
   })
   role: UserRole;
-
-  @IsString({
-    message: 'The subscriptionType field must be a string.',
-  })
-  subscriptionType: string;
 }
 
 export class OrganisationRegisterDto extends BaseAuthDto {
