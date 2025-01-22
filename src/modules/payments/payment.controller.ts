@@ -1,4 +1,4 @@
-import { Controller, Headers, Param, Post, Req } from '@nestjs/common';
+import { BadRequestException, Controller, Param, Post, Req, Res } from '@nestjs/common';
 import { Request } from 'express';
 import { PaymentService } from './payment.service';
 
@@ -17,15 +17,18 @@ export class PaymentController {
   }
 
   @Post('webhook')
-  async handleWebhook(@Req() request: Request, @Headers('stripe-signature') signature: string) {
-    const rawBody = request.body;
+  async handleWebhook(@Req() req: Request, @Res() res: Response) {
+    const rawBody = req.body;
+    const signature = req.headers['stripe-signature'];
+
+    if (!rawBody || !signature) {
+      throw new BadRequestException('Missing rawBody or stripe-signature in the request');
+    }
 
     try {
-      const event = await this.paymentService.handleWebhook(rawBody, signature);
-
-      return { received: event };
+      await this.paymentService.handleWebhook(rawBody, signature as string);
     } catch (error) {
-      return { error: 'Webhook handler failed' };
+      console.error('Error handling webhook:', error.message);
     }
   }
 }

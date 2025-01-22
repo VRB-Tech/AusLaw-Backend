@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import * as express from 'express';
 import { Sequelize } from 'sequelize-typescript';
 import { AppModule } from './app.module';
 
@@ -16,6 +17,7 @@ async function main() {
 
   app.useWebSocketAdapter(new IoAdapter(app));
   app.enableCors();
+  app.use('/payments/webhook', express.raw({ type: 'application/json' }));
 
   await sequelize.sync({ alter: true });
 
