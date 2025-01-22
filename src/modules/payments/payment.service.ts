@@ -52,6 +52,11 @@ export class PaymentService implements OnModuleInit {
         cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/cancel`,
       });
 
+      console.log('Session ID:', session.id);
+      console.log('Session URL:', session.url);
+      console.log('Subscription ID:', session.subscription);
+      console.log('Customer ID:', session.customer);
+
       await this.userService.update(userId, {
         subscriptionId: session.subscription as string,
         paymentStatus: 'pending',
