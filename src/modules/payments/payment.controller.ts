@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Param, Post, Req, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Param, Post, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { PaymentService } from './payment.service';
 
@@ -6,8 +6,29 @@ import { PaymentService } from './payment.service';
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
-  @Post('create/user/:userId')
-  async createUserSubscription(
+  @Post('create/instant/user/:userId')
+  async createUserInstantSubscription(
+    @Param('userId') userId: number,
+    @Body('subscriptionType') subscriptionType: 'monthly' | 'yearly',
+  ) {
+    if (!['monthly', 'yearly'].includes(subscriptionType)) {
+      throw new BadRequestException('Invalid subscription type');
+    }
+
+    try {
+      const paymentLink = await this.paymentService.createSubscriptionPaymentLinkForUser(
+        userId,
+        subscriptionType,
+      );
+
+      return { paymentLink };
+    } catch (error) {
+      return { error: `Failed to create subscription for user ${userId}: ${error.message}` };
+    }
+  }
+
+  @Post('create/trial/user/:userId')
+  async createUserTrialSubscription(
     @Param('userId') userId: number,
     @Body('subscriptionType') subscriptionType: 'monthly' | 'quarterly' | 'yearly',
   ) {
@@ -26,7 +47,31 @@ export class PaymentController {
       return { error: `Failed to create subscription for user ${userId}: ${error.message}` };
     }
   }
-  @Post('create/organisation/:organisationId')
+
+  @Post('create/instant/organisation/:organisationId')
+  async createOrganisationInstantSubscription(
+    @Param('organisationId') organisationId: number,
+    @Body('subscriptionType') subscriptionType: 'monthly' | 'yearly',
+  ) {
+    if (!['monthly', 'yearly'].includes(subscriptionType)) {
+      throw new BadRequestException('Invalid subscription type');
+    }
+
+    try {
+      const paymentLink = await this.paymentService.createSubscriptionPaymentLinkForOrganisation(
+        organisationId,
+        subscriptionType,
+      );
+
+      return { paymentLink };
+    } catch (error) {
+      return {
+        error: `Failed to create subscription for organisation ${organisationId}: ${error.message}`,
+      };
+    }
+  }
+
+  @Post('create/trial/organisation/:organisationId')
   async createOrganisationSubscription(
     @Param('organisationId') organisationId: number,
     @Body('subscriptionType') subscriptionType: 'monthly' | 'quarterly' | 'yearly',
@@ -75,7 +120,7 @@ export class PaymentController {
   }
 
   @Post('webhook')
-  async handleWebhook(@Req() req: Request, @Res() res: Response) {
+  async handleWebhook(@Req() req: Request) {
     const rawBody = req.body;
     const signature = req.headers['stripe-signature'];
 

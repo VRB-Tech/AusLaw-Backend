@@ -27,6 +27,78 @@ export class PaymentService implements OnModuleInit {
     });
   }
 
+  async createSubscriptionPaymentLinkForUser(
+    userId: number,
+    subscriptionType: 'monthly' | 'yearly',
+  ): Promise<string> {
+    try {
+      const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
+
+      if (!priceId) {
+        throw new Error(`Price ID for subscription type ${subscriptionType} is not configured`);
+      }
+
+      const session = await this.stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'subscription',
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/success`,
+        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/cancel`,
+      });
+
+      await this.userService.update(userId.toString(), {
+        checkoutSessionId: session.id,
+        paymentStatus: 'pending',
+      });
+
+      return session.url;
+    } catch (error) {
+      this.logger.error(`Error creating subscription payment link for ${subscriptionType}`, error);
+      throw error;
+    }
+  }
+
+  async createSubscriptionPaymentLinkForOrganisation(
+    organisationId: number,
+    subscriptionType: 'monthly' | 'yearly',
+  ): Promise<string> {
+    try {
+      const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
+
+      if (!priceId) {
+        throw new Error(`Price ID for subscription type ${subscriptionType} is not configured`);
+      }
+
+      const session = await this.stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'subscription',
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/success`,
+        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/cancel`,
+      });
+
+      await this.organisationService.update(organisationId.toString(), {
+        checkoutSessionId: session.id,
+        paymentStatus: 'pending',
+      });
+
+      return session.url;
+    } catch (error) {
+      this.logger.error(`Error creating subscription payment link for ${subscriptionType}`, error);
+      throw error;
+    }
+  }
+
   async createTrialSubscriptionPaymentLinkForUser(
     userId: number,
     subscriptionType: 'monthly' | 'quarterly' | 'yearly',

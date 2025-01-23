@@ -51,7 +51,7 @@ export class CreateUserDto {
   timezone?: string;
 
   @IsEnum({ message: 'Role must be a valid UserRole' })
-  role?: UserRole = 'user';
+  role: UserRole = 'user';
 
   @IsString()
   @IsOptional()

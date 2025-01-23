@@ -69,6 +69,7 @@ export class AuthService {
         firstName,
         lastName,
         password,
+        role: 'user',
       });
 
       return {
