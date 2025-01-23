@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsNumber, IsString } from 'class-validator';
+import { IsEmail, IsNumber, IsString } from 'class-validator';
 import { UserRole } from 'src/types/UserRole';
 
 export class UserResponseDto {
@@ -16,10 +16,4 @@ export class UserResponseDto {
 
   @IsString()
   role: UserRole;
-
-  @IsBoolean()
-  isDoyles: boolean;
-
-  @IsString()
-  paymentLink?: string;
 }

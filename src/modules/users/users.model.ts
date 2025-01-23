@@ -4,7 +4,6 @@ import {
   BelongsToMany,
   Column,
   DataType,
-  Default,
   HasMany,
   Model,
   PrimaryKey,
@@ -42,13 +41,6 @@ export class User extends Model<User> {
     },
   })
   lastName: string;
-
-  @Default(false)
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-  })
-  isDoyles: boolean;
 
   @Column({
     type: DataType.STRING,

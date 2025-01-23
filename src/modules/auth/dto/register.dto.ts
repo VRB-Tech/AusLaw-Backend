@@ -1,23 +1,6 @@
-import {
-  IsBoolean,
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  Matches,
-  MinLength,
-} from 'class-validator';
-import { UserRole } from 'src/types/UserRole';
+import { IsEmail, IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
 
 export class BaseAuthDto {
-  @IsBoolean({
-    message: 'The isDoyles field must be a boolean value.',
-  })
-  @IsNotEmpty({
-    message: 'The isDoyles field cannot be empty.',
-  })
-  isDoyles: boolean;
-
   @IsEmail({}, { message: 'Email must be a valid email address' })
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
@@ -28,15 +11,6 @@ export class BaseAuthDto {
   @Matches(/[a-z]/, { message: 'Password must contain at least one lowercase letter' })
   @Matches(/\d/, { message: 'Password must contain at least one number' })
   password: string;
-
-  @IsOptional()
-  @IsString({
-    message: 'The role field must be a string.',
-  })
-  @IsNotEmpty({
-    message: 'The role field cannot be empty.',
-  })
-  role: UserRole;
 }
 
 export class OrganisationRegisterDto extends BaseAuthDto {

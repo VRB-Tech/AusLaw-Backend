@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { UserRole } from 'src/types/UserRole';
 
 export class CreateUserDto {
@@ -17,10 +17,6 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty({ message: 'Password is required' })
   password: string;
-
-  @IsBoolean()
-  @IsNotEmpty({ message: 'Doyles status is required' })
-  isDoyles: boolean;
 
   @IsString()
   @IsOptional()
@@ -55,7 +51,7 @@ export class CreateUserDto {
   timezone?: string;
 
   @IsEnum({ message: 'Role must be a valid UserRole' })
-  role?: UserRole;
+  role?: UserRole = 'user';
 
   @IsString()
   @IsOptional()

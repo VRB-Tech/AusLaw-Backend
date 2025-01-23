@@ -27,21 +27,16 @@ export class AuthService {
   ) {}
 
   async registerUser(authDto: UserRegisterDto): Promise<void> {
-    const { isDoyles, email, firstName, lastName, role, password } = authDto;
+    const { email, firstName, lastName, password } = authDto;
 
-    if (role !== 'user' && role !== 'individual') {
-      throw new UnauthorizedException('Invalid user role');
-    }
+    const account = await this.findAccountByEmail(email);
 
-    const existingUser = await this.usersService.findByEmail(email);
-    const existingOrganisation = await this.organisationsService.findByEmail(email);
-
-    if (existingUser || existingOrganisation) {
+    if (account) {
       throw new ConflictException('Account already exists');
     }
 
     const registrationToken = this.jwtService.sign(
-      { isDoyles, email, firstName, lastName, role, password },
+      { email, firstName, lastName, password },
       { expiresIn: '1h' },
     );
 
@@ -61,7 +56,7 @@ export class AuthService {
     try {
       const decoded = this.jwtService.verify(registrationToken);
 
-      const { isDoyles, email, firstName, lastName, password, role } = decoded;
+      const { email, firstName, lastName, password } = decoded;
 
       const existingUser = await this.usersService.findByEmail(email);
 
@@ -74,8 +69,6 @@ export class AuthService {
         firstName,
         lastName,
         password,
-        isDoyles,
-        role,
       });
 
       return {
@@ -83,7 +76,6 @@ export class AuthService {
         email: newUser.email,
         firstName: newUser.firstName,
         lastName: newUser.lastName,
-        isDoyles: newUser.isDoyles,
         role: newUser.role,
       };
     } catch (err) {
@@ -92,19 +84,15 @@ export class AuthService {
   }
 
   async registerOrganisation(authDto: OrganisationRegisterDto): Promise<void> {
-    const { email, name, isDoyles, password } = authDto;
+    const { email, name, password } = authDto;
 
-    const existingUser = await this.usersService.findByEmail(email);
-    const existingOrganisation = await this.organisationsService.findByEmail(email);
+    const account = await this.findAccountByEmail(email);
 
-    if (existingOrganisation || existingUser) {
+    if (account) {
       throw new ConflictException('Account already exists');
     }
 
-    const registrationToken = this.jwtService.sign(
-      { email, name, isDoyles, password },
-      { expiresIn: '15m' },
-    );
+    const registrationToken = this.jwtService.sign({ email, name, password }, { expiresIn: '15m' });
 
     const redirectUrl = `${this.configService.get('FRONTEND_URL')}/en/register/confirm?accountType=organisation&token=${registrationToken}`;
 
@@ -248,8 +236,8 @@ export class AuthService {
 
       const { subject, email } = decoded;
 
-      const user = await this.usersService.findById(subject);
-      const organisation = await this.organisationsService.findById(subject);
+      const user = await this.usersService.findById(subject.id);
+      const organisation = await this.organisationsService.findById(subject.id);
 
       const account = user || organisation;
 
@@ -295,7 +283,6 @@ export class AuthService {
       lastName: profile.lastName,
       email: profile.email,
       password: 'oauth',
-      isDoyles: false,
       role: 'user',
     });
 
@@ -305,7 +292,6 @@ export class AuthService {
       firstName: newUser.firstName,
       lastName: newUser.lastName,
       role: newUser.role,
-      isDoyles: newUser.isDoyles,
     };
   }
 

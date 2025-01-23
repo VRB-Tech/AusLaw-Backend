@@ -36,11 +36,7 @@ export class UsersService {
     return this.userModel.findAll();
   }
 
-  async findById(userId: number): Promise<User | null> {
-    return this.userModel.findOne({ where: { id: userId } });
-  }
-
-  async findOne(id: string): Promise<User> {
+  async findById(id: number): Promise<User> {
     const user = await this.userModel.findByPk(id);
 
     if (!user) {
@@ -118,7 +114,7 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    const user = await this.findOne(id);
+    const user = await this.findById(+id);
 
     if (!user) {
       throw new NotFoundException(`User with ID: '${id}' not found`);
