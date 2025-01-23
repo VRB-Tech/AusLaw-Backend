@@ -36,14 +36,20 @@ export class OrganisationsService {
     await this.organisationModel.update({ paymentStatus }, { where: { id: organisationId } });
   }
 
-  async update(id: string, updateUserDto: Partial<CreateOrganisationDto>): Promise<Organisation> {
-    const user = await this.organisationModel.findByPk(id);
+  async update(
+    id: string,
+    updateOrganisationDto: Partial<CreateOrganisationDto>,
+  ): Promise<Organisation> {
+    const organisation = await this.organisationModel.findByPk(id);
 
-    if (updateUserDto.password) {
-      updateUserDto.password = await this.updatePassword(user.id, updateUserDto.password);
+    if (updateOrganisationDto.password) {
+      updateOrganisationDto.password = await this.updatePassword(
+        organisation.id,
+        updateOrganisationDto.password,
+      );
     }
 
-    return user.update(updateUserDto);
+    return organisation.update(updateOrganisationDto);
   }
 
   async updateRefreshToken(id: number, refreshToken: string | null): Promise<void> {

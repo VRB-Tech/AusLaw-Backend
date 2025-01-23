@@ -262,6 +262,7 @@ export class PaymentService implements OnModuleInit {
             await this.userService.update(user.id.toString(), {
               paymentStatus: 'active',
               customerStripeId: session.customer as string,
+              subscriptionId: session.subscription as string,
             });
             this.logger.log(`Payment completed for user ID: ${user.id}`);
           } else {
