@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Param, Post, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { PaymentService } from './payment.service';
 
@@ -119,6 +119,38 @@ export class PaymentController {
     }
   }
 
+  @Post('activate/user/:userId')
+  async activateSubscriptionForUser(
+    @Param('userId') userId: string,
+    @Body('subscriptionId') subscriptionId: string,
+    @Body('email') email: string,
+  ) {
+    try {
+      await this.paymentService.activateCanceledSubscription(subscriptionId, email);
+
+      return { message: `Subscription for user ${userId} has been activated.` };
+    } catch (error) {
+      return { error: `Failed to activate subscription for user ${userId}: ${error.message}` };
+    }
+  }
+
+  @Post('activate/organisation/:organisationId')
+  async activateSubscriptionForOrganisation(
+    @Param('organisationId') organisationId: string,
+    @Body('subscriptionId') subscriptionId: string,
+    @Body('email') email: string,
+  ) {
+    try {
+      await this.paymentService.activateCanceledSubscription(subscriptionId, email);
+
+      return { message: `Subscription for organisation ${organisationId} has been acxivated.` };
+    } catch (error) {
+      return {
+        error: `Failed to activate subscription for organisation ${organisationId}: ${error.message}`,
+      };
+    }
+  }
+
   @Post('webhook')
   async handleWebhook(@Req() req: Request) {
     const rawBody = req.body;
@@ -132,6 +164,15 @@ export class PaymentController {
       await this.paymentService.handleWebhook(rawBody, signature as string);
     } catch (error) {
       console.error('Error handling webhook:', error.message);
+    }
+  }
+
+  @Get('prices')
+  async getPrices() {
+    try {
+      return await this.paymentService.getSubscriptionPrices();
+    } catch (error) {
+      return { error: `Failed to fetch prices: ${error.message}` };
     }
   }
 }

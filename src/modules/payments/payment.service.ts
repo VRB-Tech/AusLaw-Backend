@@ -7,6 +7,7 @@ import { UsersService } from '../users/users.service';
 @Injectable()
 export class PaymentService implements OnModuleInit {
   private stripe: Stripe;
+  private pricesById: string[];
   private readonly logger = new Logger(PaymentService.name);
 
   constructor(
@@ -17,6 +18,12 @@ export class PaymentService implements OnModuleInit {
 
   onModuleInit() {
     const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
+
+    this.pricesById = [
+      this.configService.get<string>('STRIPE_MONTHLY_PRICE_ID'),
+      this.configService.get<string>('STRIPE_ANNUALY_PRICE_ID'),
+      this.configService.get<string>('STRIPE_DOYLES_ANNUALY_PRICE_ID'),
+    ];
 
     if (!stripeSecretKey) {
       throw new Error('Stripe secret key not configured');
@@ -183,14 +190,41 @@ export class PaymentService implements OnModuleInit {
     }
   }
 
-  private getPriceIdBySubscriptionType(subscriptionType: string): string {
-    const priceMap = {
-      monthly: this.configService.get<string>('STRIPE_MONTHLY_PRICE_ID'),
-      quarterly: this.configService.get<string>('STRIPE_QUARTERLY_PRICE_ID'),
-      yearly: this.configService.get<string>('STRIPE_YEARLY_PRICE_ID'),
-    };
+  async getSubscriptionPrices(): Promise<Stripe.Price[]> {
+    const prices = await Promise.all(
+      this.pricesById.map(async priceId => await this.stripe.prices.retrieve(priceId)),
+    );
 
-    return priceMap[subscriptionType];
+    return prices;
+  }
+
+  async activateCanceledSubscription(subscriptionId: string, email: string): Promise<void> {
+    try {
+      const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
+
+      if (!subscription || subscription.status !== 'canceled') {
+        throw new Error('Subscription is not canceled or does not exist');
+      }
+
+      const account =
+        (await this.userService.findByEmail(email)) ||
+        (await this.organisationService.findByEmail(email));
+
+      await this.stripe.subscriptions.update(subscriptionId, {
+        cancel_at_period_end: false,
+      });
+
+      'role' in account
+        ? await this.userService.update(account.id.toString(), {
+            paymentStatus: 'active',
+          })
+        : await this.organisationService.update(account.id.toString(), {
+            paymentStatus: 'active',
+          });
+    } catch (error) {
+      this.logger.error(`Error reactivating subscription with ID: ${subscriptionId}`, error);
+      throw error;
+    }
   }
 
   async cancelSubscription(userId: number): Promise<void> {
@@ -315,5 +349,9 @@ export class PaymentService implements OnModuleInit {
       this.logger.error(`Error handling webhook event: ${error.message}`, error);
       throw new Error(`Webhook handling failed: ${error.message}`);
     }
+  }
+
+  private getPriceIdBySubscriptionType(subscriptionType: string): string {
+    return this.pricesById[subscriptionType];
   }
 }
