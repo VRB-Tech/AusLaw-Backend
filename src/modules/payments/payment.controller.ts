@@ -9,9 +9,9 @@ export class PaymentController {
   @Post('create/instant/user/:userId')
   async createUserInstantSubscription(
     @Param('userId') userId: number,
-    @Body('subscriptionType') subscriptionType: 'monthly' | 'yearly',
+    @Body('subscriptionType') subscriptionType: 'monthly' | 'annualy',
   ) {
-    if (!['monthly', 'yearly'].includes(subscriptionType)) {
+    if (!['monthly', 'annualy'].includes(subscriptionType)) {
       throw new BadRequestException('Invalid subscription type');
     }
 
@@ -30,9 +30,9 @@ export class PaymentController {
   @Post('create/trial/user/:userId')
   async createUserTrialSubscription(
     @Param('userId') userId: number,
-    @Body('subscriptionType') subscriptionType: 'monthly' | 'quarterly' | 'yearly',
+    @Body('subscriptionType') subscriptionType: 'monthly' | 'annualy',
   ) {
-    if (!['monthly', 'quarterly', 'yearly'].includes(subscriptionType)) {
+    if (!['monthly', 'annualy'].includes(subscriptionType)) {
       throw new BadRequestException('Invalid subscription type');
     }
 
@@ -51,9 +51,9 @@ export class PaymentController {
   @Post('create/instant/organisation/:organisationId')
   async createOrganisationInstantSubscription(
     @Param('organisationId') organisationId: number,
-    @Body('subscriptionType') subscriptionType: 'monthly' | 'yearly',
+    @Body('subscriptionType') subscriptionType: 'annualyDoyles',
   ) {
-    if (!['monthly', 'yearly'].includes(subscriptionType)) {
+    if (!['annualyDoyles'].includes(subscriptionType)) {
       throw new BadRequestException('Invalid subscription type');
     }
 
@@ -74,9 +74,9 @@ export class PaymentController {
   @Post('create/trial/organisation/:organisationId')
   async createOrganisationSubscription(
     @Param('organisationId') organisationId: number,
-    @Body('subscriptionType') subscriptionType: 'monthly' | 'quarterly' | 'yearly',
+    @Body('subscriptionType') subscriptionType: 'annualyDoyles',
   ) {
-    if (!['monthly', 'quarterly', 'yearly'].includes(subscriptionType)) {
+    if (!['annualyDoyles'].includes(subscriptionType)) {
       throw new BadRequestException('Invalid subscription type');
     }
 
@@ -115,38 +115,6 @@ export class PaymentController {
     } catch (error) {
       return {
         error: `Failed to cancel subscription for organisation ${organisationId}: ${error.message}`,
-      };
-    }
-  }
-
-  @Post('activate/user/:userId')
-  async activateSubscriptionForUser(
-    @Param('userId') userId: string,
-    @Body('subscriptionId') subscriptionId: string,
-    @Body('email') email: string,
-  ) {
-    try {
-      await this.paymentService.activateCanceledSubscription(subscriptionId, email);
-
-      return { message: `Subscription for user ${userId} has been activated.` };
-    } catch (error) {
-      return { error: `Failed to activate subscription for user ${userId}: ${error.message}` };
-    }
-  }
-
-  @Post('activate/organisation/:organisationId')
-  async activateSubscriptionForOrganisation(
-    @Param('organisationId') organisationId: string,
-    @Body('subscriptionId') subscriptionId: string,
-    @Body('email') email: string,
-  ) {
-    try {
-      await this.paymentService.activateCanceledSubscription(subscriptionId, email);
-
-      return { message: `Subscription for organisation ${organisationId} has been acxivated.` };
-    } catch (error) {
-      return {
-        error: `Failed to activate subscription for organisation ${organisationId}: ${error.message}`,
       };
     }
   }

@@ -36,7 +36,7 @@ export class PaymentService implements OnModuleInit {
 
   async createSubscriptionPaymentLinkForUser(
     userId: number,
-    subscriptionType: 'monthly' | 'yearly',
+    subscriptionType: 'monthly' | 'annualy',
   ): Promise<string> {
     try {
       const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
@@ -72,7 +72,7 @@ export class PaymentService implements OnModuleInit {
 
   async createSubscriptionPaymentLinkForOrganisation(
     organisationId: number,
-    subscriptionType: 'monthly' | 'yearly',
+    subscriptionType: 'annualyDoyles',
   ): Promise<string> {
     try {
       const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
@@ -108,7 +108,7 @@ export class PaymentService implements OnModuleInit {
 
   async createTrialSubscriptionPaymentLinkForUser(
     userId: number,
-    subscriptionType: 'monthly' | 'quarterly' | 'yearly',
+    subscriptionType: 'monthly' | 'annualy',
   ): Promise<string> {
     try {
       const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
@@ -150,7 +150,7 @@ export class PaymentService implements OnModuleInit {
 
   async createTrialSubscriptionPaymentLinkForOrganisation(
     organisationId: number,
-    subscriptionType: 'monthly' | 'quarterly' | 'yearly',
+    subscriptionType: 'annualyDoyles',
   ): Promise<string> {
     try {
       const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
@@ -199,6 +199,7 @@ export class PaymentService implements OnModuleInit {
           }
 
           const price = await this.stripe.prices.retrieve(priceId);
+
           const value = (price.unit_amount ? price.unit_amount / 100 : 0).toFixed(2);
 
           return { name, value: `${value}$` };
@@ -208,35 +209,6 @@ export class PaymentService implements OnModuleInit {
       return prices;
     } catch (error) {
       this.logger.error(`Failed to fetch prices: ${error.message}`);
-      throw error;
-    }
-  }
-
-  async activateCanceledSubscription(subscriptionId: string, email: string): Promise<void> {
-    try {
-      const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
-
-      if (!subscription || subscription.status !== 'canceled') {
-        throw new Error('Subscription is not canceled or does not exist');
-      }
-
-      const account =
-        (await this.userService.findByEmail(email)) ||
-        (await this.organisationService.findByEmail(email));
-
-      await this.stripe.subscriptions.update(subscriptionId, {
-        cancel_at_period_end: false,
-      });
-
-      'role' in account
-        ? await this.userService.update(account.id.toString(), {
-            paymentStatus: 'active',
-          })
-        : await this.organisationService.update(account.id.toString(), {
-            paymentStatus: 'active',
-          });
-    } catch (error) {
-      this.logger.error(`Error reactivating subscription with ID: ${subscriptionId}`, error);
       throw error;
     }
   }

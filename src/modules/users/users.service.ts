@@ -95,6 +95,10 @@ export class UsersService {
   async update(id: string, updateUserDto: Partial<CreateUserDto>): Promise<User> {
     const user = await this.userModel.findByPk(id);
 
+    if (!user) {
+      throw new NotFoundException(`User with ID: '${id}' not found`);
+    }
+
     if (updateUserDto.password) {
       updateUserDto.password = await this.updatePassword(user.id, updateUserDto.password);
     }
