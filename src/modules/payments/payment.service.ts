@@ -7,7 +7,7 @@ import { UsersService } from '../users/users.service';
 @Injectable()
 export class PaymentService implements OnModuleInit {
   private stripe: Stripe;
-  private pricesById: string[];
+  private pricesById: { [key: string]: string };
   private readonly logger = new Logger(PaymentService.name);
 
   constructor(
@@ -19,11 +19,11 @@ export class PaymentService implements OnModuleInit {
   onModuleInit() {
     const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
 
-    this.pricesById = [
-      this.configService.get<string>('STRIPE_MONTHLY_PRICE_ID'),
-      this.configService.get<string>('STRIPE_ANNUALY_PRICE_ID'),
-      this.configService.get<string>('STRIPE_DOYLES_ANNUALY_PRICE_ID'),
-    ];
+    this.pricesById = {
+      monthly: this.configService.get<string>('STRIPE_MONTHLY_PRICE_ID'),
+      annualy: this.configService.get<string>('STRIPE_ANNUALY_PRICE_ID'),
+      anunualyDoyles: this.configService.get<string>('STRIPE_DOYLES_ANNUALY_PRICE_ID'),
+    };
 
     if (!stripeSecretKey) {
       throw new Error('Stripe secret key not configured');
@@ -190,14 +190,26 @@ export class PaymentService implements OnModuleInit {
     }
   }
 
-  async getSubscriptionPrices(): Promise<Stripe.Price[]> {
-    const prices = await Promise.all(
-      Object.values(this.pricesById).map(
-        async priceId => await this.stripe.prices.retrieve(priceId),
-      ),
-    );
+  async getSubscriptionPrices(): Promise<{ name: {}; value: string }[]> {
+    try {
+      const prices = await Promise.all(
+        Object.entries(this.pricesById).map(async ([name, priceId]) => {
+          if (!priceId) {
+            throw new Error(`Price ID for ${name} is undefined!`);
+          }
 
-    return prices;
+          const price = await this.stripe.prices.retrieve(priceId);
+          const value = (price.unit_amount ? price.unit_amount / 100 : 0).toFixed(2);
+
+          return { name, value: `${value}$` };
+        }),
+      );
+
+      return prices;
+    } catch (error) {
+      this.logger.error(`Failed to fetch prices: ${error.message}`);
+      throw error;
+    }
   }
 
   async activateCanceledSubscription(subscriptionId: string, email: string): Promise<void> {
