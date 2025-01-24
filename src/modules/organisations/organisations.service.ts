@@ -20,7 +20,7 @@ export class OrganisationsService {
   }
 
   async create(createOrganisationDto: CreateOrganisationDto): Promise<Organisation> {
-    const { name, email, password, isDoyles } = createOrganisationDto;
+    const { name, email, password } = createOrganisationDto;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -28,7 +28,6 @@ export class OrganisationsService {
       name,
       email,
       password: hashedPassword,
-      isDoyles,
     });
   }
 

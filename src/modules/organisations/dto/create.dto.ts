@@ -1,12 +1,4 @@
-import {
-  IsBoolean,
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CreateOrganisationDto {
   @IsNotEmpty({ message: 'The organisation name is required.' })
@@ -23,9 +15,6 @@ export class CreateOrganisationDto {
   @MinLength(8, { message: 'The password must be at least 8 characters long.' })
   @MaxLength(128, { message: 'The password must not exceed 128 characters.' })
   password: string;
-
-  @IsBoolean({ message: 'The isDoyles field must be a boolean.' })
-  isDoyles: boolean;
 
   @IsString()
   @IsOptional()

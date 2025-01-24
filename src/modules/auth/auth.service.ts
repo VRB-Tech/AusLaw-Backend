@@ -113,7 +113,7 @@ export class AuthService {
     try {
       const decoded = this.jwtService.verify(registrationToken);
 
-      const { isDoyles, email, name, password } = decoded;
+      const { email, name, password } = decoded;
 
       const existingOrganisation = await this.organisationsService.findByEmail(email);
 
@@ -125,7 +125,6 @@ export class AuthService {
         email,
         name,
         password,
-        isDoyles,
       });
 
       return {

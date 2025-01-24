@@ -295,8 +295,8 @@ export class PaymentService implements OnModuleInit {
           if (user) {
             await this.userService.update(user.id.toString(), {
               paymentStatus: 'canceled',
-              subscriptionId: null,
             });
+
             this.logger.log(
               `Subscription canceled. Updated status to canceled for user ID: ${user.id}`,
             );
