@@ -28,6 +28,14 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
+  country?: string;
+
+  @IsString()
+  @IsOptional()
+  state?: string;
+
+  @IsString()
+  @IsOptional()
   phone?: string;
 
   @IsString()

@@ -76,6 +76,16 @@ export class User extends Model<User> {
   })
   phone: string;
 
+  @Column({
+    type: DataType.STRING,
+  })
+  country: string;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  state: string;
+
   @Column(DataType.STRING)
   refreshToken: string;
 
