@@ -192,7 +192,9 @@ export class PaymentService implements OnModuleInit {
 
   async getSubscriptionPrices(): Promise<Stripe.Price[]> {
     const prices = await Promise.all(
-      this.pricesById.map(async priceId => await this.stripe.prices.retrieve(priceId)),
+      Object.values(this.pricesById).map(
+        async priceId => await this.stripe.prices.retrieve(priceId),
+      ),
     );
 
     return prices;
