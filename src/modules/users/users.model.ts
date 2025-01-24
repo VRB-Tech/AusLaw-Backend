@@ -71,8 +71,13 @@ export class User extends Model<User> {
   })
   photo: string;
 
+  @Column({
+    type: DataType.STRING,
+  })
+  phone: string;
+
   @Column(DataType.STRING)
-  refreshToken?: string;
+  refreshToken: string;
 
   @Column({
     type: DataType.STRING,
@@ -136,6 +141,12 @@ export class User extends Model<User> {
 
   @Column(DataType.ARRAY(DataType.STRING))
   locations: string[];
+
+  @Column(DataType.STRING)
+  city: string;
+
+  @Column(DataType.ARRAY(DataType.STRING))
+  specialisations: string[];
 
   @HasMany(() => ChatUser)
   chatUsers: ChatUser[];

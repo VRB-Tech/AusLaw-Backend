@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { UserRole } from 'src/types/UserRole';
 
 export class CreateUserDto {
@@ -28,6 +28,10 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
+  phone?: string;
+
+  @IsString()
+  @IsOptional()
   firebaseId?: string;
 
   @IsString()
@@ -52,6 +56,22 @@ export class CreateUserDto {
 
   @IsEnum({ message: 'Role must be a valid UserRole' })
   role: UserRole = 'user';
+
+  @IsString()
+  @IsOptional()
+  bio?: string;
+
+  @IsArray()
+  services?: string[];
+
+  @IsArray()
+  specialisations?: string[];
+
+  @IsArray()
+  locations?: string[];
+
+  @IsString()
+  city?: string;
 
   @IsString()
   @IsOptional()
