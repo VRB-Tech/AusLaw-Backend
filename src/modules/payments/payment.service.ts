@@ -36,7 +36,7 @@ export class PaymentService implements OnModuleInit {
 
   async createSubscriptionPaymentLinkForUser(
     userId: number,
-    subscriptionType: 'monthly' | 'annualy',
+    subscriptionType: 'monthly' | 'annualy' | 'annualyDoyles',
   ): Promise<string> {
     try {
       const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
@@ -54,8 +54,8 @@ export class PaymentService implements OnModuleInit {
             quantity: 1,
           },
         ],
-        success_url: `${this.configService.get<string>('FRONTEND_URL')}/success`,
-        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/cancel`,
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/payment`,
+        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/profile`,
       });
 
       await this.userService.update(userId.toString(), {
@@ -90,8 +90,8 @@ export class PaymentService implements OnModuleInit {
             quantity: 1,
           },
         ],
-        success_url: `${this.configService.get<string>('FRONTEND_URL')}/success`,
-        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/cancel`,
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/payment`,
+        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/profile`,
       });
 
       await this.organisationService.update(organisationId.toString(), {
@@ -129,8 +129,8 @@ export class PaymentService implements OnModuleInit {
         subscription_data: {
           trial_period_days: 14,
         },
-        success_url: `${this.configService.get<string>('FRONTEND_URL')}/success`,
-        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/cancel`,
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/payment`,
+        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/profile`,
       });
 
       await this.userService.update(userId.toString(), {
@@ -150,7 +150,7 @@ export class PaymentService implements OnModuleInit {
 
   async createTrialSubscriptionPaymentLinkForOrganisation(
     organisationId: number,
-    subscriptionType: 'annualyDoyles',
+    subscriptionType: 'monthly' | 'annualy' | 'annualyDoyles',
   ): Promise<string> {
     try {
       const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
@@ -171,8 +171,8 @@ export class PaymentService implements OnModuleInit {
         subscription_data: {
           trial_period_days: 14,
         },
-        success_url: `${this.configService.get<string>('FRONTEND_URL')}/success`,
-        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/cancel`,
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/payment`,
+        cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/profile`,
       });
 
       await this.organisationService.update(organisationId.toString(), {

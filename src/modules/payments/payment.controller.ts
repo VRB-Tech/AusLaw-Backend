@@ -9,9 +9,9 @@ export class PaymentController {
   @Post('create/instant/user/:userId')
   async createUserInstantSubscription(
     @Param('userId') userId: number,
-    @Body('subscriptionType') subscriptionType: 'monthly' | 'annualy',
+    @Body('subscriptionType') subscriptionType: 'monthly' | 'annualy' | 'annualyDoyles',
   ) {
-    if (!['monthly', 'annualy'].includes(subscriptionType)) {
+    if (!['monthly', 'annualy', 'annualyDoyles'].includes(subscriptionType)) {
       throw new BadRequestException('Invalid subscription type');
     }
 
@@ -74,9 +74,9 @@ export class PaymentController {
   @Post('create/trial/organisation/:organisationId')
   async createOrganisationSubscription(
     @Param('organisationId') organisationId: number,
-    @Body('subscriptionType') subscriptionType: 'annualyDoyles',
+    @Body('subscriptionType') subscriptionType: 'monthly' | 'annualy' | 'annualyDoyles',
   ) {
-    if (!['annualyDoyles'].includes(subscriptionType)) {
+    if (!['monthly', 'annualy', 'annualyDoyles'].includes(subscriptionType)) {
       throw new BadRequestException('Invalid subscription type');
     }
 
