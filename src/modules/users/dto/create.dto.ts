@@ -1,31 +1,51 @@
-import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  IsUUID,
+  Matches,
+  Min,
+} from 'class-validator';
 import { PaymentStatus } from 'src/types/PaymentStatus';
 import { UserRole } from 'src/types/UserRole';
 
 export class CreateUserDto {
   @IsString()
-  @IsNotEmpty({ message: 'Username is required' })
+  @IsNotEmpty({ message: 'First name is required' })
+  @Matches(/^[a-zA-Z\s]+$/, { message: 'First name must only contain letters and spaces' })
   firstName: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'Username is required' })
+  @IsNotEmpty({ message: 'Last name is required' })
+  @Matches(/^[a-zA-Z\s]+$/, { message: 'Last name must only contain letters and spaces' })
   lastName: string;
 
-  @IsString()
+  @IsEmail({}, { message: 'Email must be a valid email address' })
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Password is required' })
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
+    message:
+      'Password must contain at least 8 characters, including letters, numbers, and special characters',
+  })
   password: string;
 
   @IsString()
   @IsOptional()
+  @Matches(/^[a-zA-Z\s]+$/, { message: 'Status must only contain letters and spaces' })
   status?: string;
 
   @IsString()
   @IsOptional()
-  photo?: Express.Multer.File | string;
+  photo?: string | Express.Multer.File;
 
   @IsString()
   @IsOptional()
@@ -35,11 +55,11 @@ export class CreateUserDto {
   @IsOptional()
   state?: string;
 
-  @IsString()
+  @IsPhoneNumber(null, { message: 'Phone number must be a valid phone number' })
   @IsOptional()
   phone?: string;
 
-  @IsString()
+  @IsUUID('4', { message: 'Firebase ID must be a valid UUID' })
   @IsOptional()
   firebaseId?: string;
 
@@ -63,7 +83,7 @@ export class CreateUserDto {
   @IsOptional()
   timezone?: string;
 
-  @IsEnum({ message: 'Role must be a valid UserRole' })
+  @IsIn(['user'], { message: 'Role must be a valid UserRole' })
   role: UserRole = 'user';
 
   @IsString()
@@ -72,29 +92,41 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsNumber({ allowNaN: false, allowInfinity: false })
+  @Min(0, { message: 'Hourly rate must be a positive number' })
   hourlyRate?: number;
 
   @IsOptional()
   @IsNumber({ allowNaN: false, allowInfinity: false })
+  @Min(0, { message: 'Daily rate must be a positive number' })
   dailyRate?: number;
 
   @IsArray()
+  @IsOptional()
+  @IsString({ each: true, message: 'Services must be an array of strings' })
   services?: string[];
 
   @IsArray()
+  @IsOptional()
+  @IsString({ each: true, message: 'Specializations must be an array of strings' })
   specialisations?: string[];
 
   @IsArray()
+  @IsOptional()
+  @IsString({ each: true, message: 'Locations must be an array of strings' })
   locations?: string[];
 
   @IsString()
+  @IsOptional()
   city?: string;
 
   @IsString()
+  @IsOptional()
   report?: string;
 
-  @IsString()
   @IsOptional()
+  @IsIn(['active', 'pending', 'canceled', 'free'], {
+    message: 'Value must be a valid Payment Status',
+  })
   paymentStatus?: PaymentStatus;
 
   @IsString()
@@ -108,4 +140,8 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   checkoutSessionId?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
 }
