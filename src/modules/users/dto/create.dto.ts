@@ -1,4 +1,5 @@
 import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { PaymentStatus } from 'src/types/PaymentStatus';
 import { UserRole } from 'src/types/UserRole';
 
 export class CreateUserDto {
@@ -83,7 +84,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  paymentStatus?: string;
+  paymentStatus?: PaymentStatus;
 
   @IsString()
   @IsOptional()

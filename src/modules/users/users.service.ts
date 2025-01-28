@@ -2,6 +2,8 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
 import { Op, WhereOptions } from 'sequelize';
+import { FileUploader } from 'src/middlewares/FileUploader';
+import { PaymentStatus } from 'src/types/PaymentStatus';
 import { CreateUserDto } from './dto/create.dto';
 import { User } from './users.model';
 
@@ -10,6 +12,7 @@ export class UsersService {
   constructor(
     @InjectModel(User)
     private userModel: typeof User,
+    private readonly fileUploader: FileUploader,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -99,6 +102,22 @@ export class UsersService {
       throw new NotFoundException(`User with ID: '${id}' not found`);
     }
 
+    let uploadedFiles: string[] = [];
+
+    if (updateUserDto.photo) {
+      const filesToUpload = Array.isArray(updateUserDto.photo)
+        ? updateUserDto.photo
+        : [updateUserDto.photo];
+
+      const validFilesToUpload = filesToUpload.filter(
+        file => typeof file === 'string' || (file as Express.Multer.File).buffer,
+      );
+
+      uploadedFiles = await this.fileUploader.uploadFiles(validFilesToUpload);
+
+      updateUserDto.photo = uploadedFiles[0];
+    }
+
     if (updateUserDto.password) {
       updateUserDto.password = await this.updatePassword(user.id, updateUserDto.password);
     }
@@ -106,7 +125,7 @@ export class UsersService {
     return user.update(updateUserDto);
   }
 
-  async updatePaymentStatus(userId: number, paymentStatus: string): Promise<void> {
+  async updatePaymentStatus(userId: number, paymentStatus: PaymentStatus): Promise<void> {
     await this.userModel.update({ paymentStatus }, { where: { id: userId } });
   }
 

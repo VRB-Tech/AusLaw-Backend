@@ -10,6 +10,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { ChatUser } from 'src/modules/chats/entities/ChatUser.model';
+import { PaymentStatus } from 'src/types/PaymentStatus';
 import { UserRole } from 'src/types/UserRole';
 import { Chat } from '../chats/chats.model';
 import { Reaction } from '../comments/entities/Reaction';
@@ -105,7 +106,7 @@ export class User extends Model<User> {
     type: DataType.STRING,
     allowNull: true,
   })
-  paymentStatus: string;
+  paymentStatus: PaymentStatus;
 
   @Column({
     type: DataType.STRING,
