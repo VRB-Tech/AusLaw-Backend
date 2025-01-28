@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { FileUploader } from 'src/middlewares/FileUploader';
+import { CloudinaryConfig } from 'src/uploads/cloudinary.config';
 import { FiltersController } from './controllers/filters.controllers';
 import { UsersController } from './controllers/users.controller';
 import { User } from './users.model';
@@ -7,7 +9,7 @@ import { UsersService } from './users.service';
 
 @Module({
   imports: [SequelizeModule.forFeature([User])],
-  providers: [UsersService],
+  providers: [UsersService, FileUploader, CloudinaryConfig],
   controllers: [UsersController, FiltersController],
   exports: [UsersService],
 })
