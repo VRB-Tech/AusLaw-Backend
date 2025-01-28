@@ -70,7 +70,7 @@ export class User extends Model<User> {
       isUrl: true,
     },
   })
-  photo: string;
+  photo: Express.Multer.File | string;
 
   @Column({
     type: DataType.STRING,

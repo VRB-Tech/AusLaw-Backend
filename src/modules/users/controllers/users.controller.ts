@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -58,7 +59,15 @@ export class UsersController {
 
   @Patch(':id')
   @UseInterceptors(FilesInterceptor('photo', 1))
-  async update(@Param('id') id: string, @Body() updateUserDto: Partial<CreateUserDto>) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: Partial<CreateUserDto>,
+    @UploadedFiles() photo: Express.Multer.File[],
+  ) {
+    if (photo && photo.length > 0) {
+      updateUserDto.photo = photo[0];
+    }
+
     return this.usersService.update(id, updateUserDto);
   }
 

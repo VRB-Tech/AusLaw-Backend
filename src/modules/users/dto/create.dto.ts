@@ -25,7 +25,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  photo?: string;
+  photo?: Express.Multer.File | string;
 
   @IsString()
   @IsOptional()
