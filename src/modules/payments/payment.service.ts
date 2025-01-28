@@ -36,7 +36,7 @@ export class PaymentService implements OnModuleInit {
 
   async createSubscriptionPaymentLinkForUser(
     userId: number,
-    subscriptionType: 'monthly' | 'annualy' | 'annualyDoyles',
+    subscriptionType: 'annualyDoyles',
   ): Promise<string> {
     try {
       const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
@@ -150,7 +150,7 @@ export class PaymentService implements OnModuleInit {
 
   async createTrialSubscriptionPaymentLinkForOrganisation(
     organisationId: number,
-    subscriptionType: 'monthly' | 'annualy' | 'annualyDoyles',
+    subscriptionType: 'monthly' | 'annualy',
   ): Promise<string> {
     try {
       const priceId = this.getPriceIdBySubscriptionType(subscriptionType);
