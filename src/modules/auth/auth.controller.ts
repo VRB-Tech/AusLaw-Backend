@@ -105,6 +105,7 @@ export class AuthController {
 
   @Post('request-password-reset')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
   async requestPasswordReset(@Body() { email }: { email: string }) {
     await this.authService.requestPasswordReset(email);
 
@@ -113,6 +114,7 @@ export class AuthController {
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
   async resetPassword(@Query('token') token: string, @Body('newPassword') newPassword: string) {
     await this.authService.resetPassword(token, newPassword);
 
