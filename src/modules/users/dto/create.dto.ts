@@ -72,7 +72,7 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsNumber({ allowNaN: false, allowInfinity: false })
-  hourlyRate: number;
+  hourlyRate?: number;
 
   @IsOptional()
   @IsNumber({ allowNaN: false, allowInfinity: false })
