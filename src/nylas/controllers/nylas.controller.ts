@@ -1,19 +1,22 @@
 import {
-  Controller,
-  Get,
-  Param,
-  NotFoundException,
-  Query,
-  Post,
   BadRequestException,
   Body,
+  Controller,
   Delete,
+  Get,
   HttpException,
   HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/modules/auth/strategies/jwt/jwt-auth.guard';
 import { NylasService } from '../nylas.service';
 
 @Controller('nylas')
+@UseGuards(JwtAuthGuard)
 export class NylasController {
   constructor(private readonly nylasService: NylasService) {}
 
@@ -28,9 +31,7 @@ export class NylasController {
 
       return data;
     } catch (error) {
-      throw new Error(
-        `Error exchanging authorization code for token: ${error.message}`,
-      );
+      throw new Error(`Error exchanging authorization code for token: ${error.message}`);
     }
   }
 
@@ -51,10 +52,7 @@ export class NylasController {
   }
 
   @Get('calendars/:calendarId')
-  async getCalendar(
-    @Param('calendarId') calendarId: string,
-    @Query('grantId') grantId: string,
-  ) {
+  async getCalendar(@Param('calendarId') calendarId: string, @Query('grantId') grantId: string) {
     try {
       const calendar = await this.nylasService.getCalendar(calendarId, grantId);
       if (!calendar) {
@@ -72,10 +70,7 @@ export class NylasController {
     @Query('grantId') grantId: string,
   ) {
     try {
-      const events = await this.nylasService.getAllEventsFromCalendar(
-        calendarId,
-        grantId,
-      );
+      const events = await this.nylasService.getAllEventsFromCalendar(calendarId, grantId);
 
       return events;
     } catch (error) {
@@ -84,9 +79,7 @@ export class NylasController {
   }
 
   @Delete('account')
-  async deleteAccountFromProjectDashboardByGrantId(
-    @Body('grantId') grantId: string,
-  ) {
+  async deleteAccountFromProjectDashboardByGrantId(@Body('grantId') grantId: string) {
     if (!grantId) {
       throw new HttpException('grantId is required', HttpStatus.BAD_REQUEST);
     }

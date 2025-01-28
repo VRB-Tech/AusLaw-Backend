@@ -13,13 +13,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/modules/auth/strategies/jwt/jwt-auth.guard';
 import { CreateUserDto } from './../dto/create.dto';
 import { User } from './../users.model';
 import { UsersService } from './../users.service';
 
 @Controller('users')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
