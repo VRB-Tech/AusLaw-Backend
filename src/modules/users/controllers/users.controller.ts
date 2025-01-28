@@ -12,7 +12,9 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/modules/auth/strategies/jwt/jwt-auth.guard';
 import { CreateUserDto } from './../dto/create.dto';
 import { User } from './../users.model';
@@ -55,6 +57,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseInterceptors(FilesInterceptor('photo', 1))
   async update(@Param('id') id: string, @Body() updateUserDto: Partial<CreateUserDto>) {
     return this.usersService.update(id, updateUserDto);
   }
