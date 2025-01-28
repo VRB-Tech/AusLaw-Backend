@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { PaymentStatus } from 'src/types/PaymentStatus';
 import { UserRole } from 'src/types/UserRole';
 
@@ -70,6 +70,14 @@ export class CreateUserDto {
   @IsOptional()
   bio?: string;
 
+  @IsOptional()
+  @IsNumber({ allowNaN: false, allowInfinity: false })
+  hourlyRate: number;
+
+  @IsOptional()
+  @IsNumber({ allowNaN: false, allowInfinity: false })
+  dailyRate?: number;
+
   @IsArray()
   services?: string[];
 
@@ -81,6 +89,9 @@ export class CreateUserDto {
 
   @IsString()
   city?: string;
+
+  @IsString()
+  report?: string;
 
   @IsString()
   @IsOptional()

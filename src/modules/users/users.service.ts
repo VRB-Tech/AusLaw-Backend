@@ -115,7 +115,9 @@ export class UsersService {
 
       uploadedFiles = await this.fileUploader.uploadFiles(validFilesToUpload);
 
-      updateUserDto.photo = uploadedFiles[0];
+      if (uploadedFiles.length > 0) {
+        updateUserDto.photo = uploadedFiles[0];
+      }
     }
 
     if (updateUserDto.password) {

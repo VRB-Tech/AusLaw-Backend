@@ -141,6 +141,9 @@ export class User extends Model<User> {
   @Column(DataType.TEXT)
   bio: string;
 
+  @Column(DataType.TEXT)
+  report: string;
+
   @Column(DataType.FLOAT)
   hourlyRate: number;
 
