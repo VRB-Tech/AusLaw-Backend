@@ -22,7 +22,7 @@ export class PaymentService implements OnModuleInit {
     this.pricesById = {
       monthly: this.configService.get<string>('STRIPE_MONTHLY_PRICE_ID'),
       annualy: this.configService.get<string>('STRIPE_ANNUALY_PRICE_ID'),
-      anunualyDoyles: this.configService.get<string>('STRIPE_DOYLES_ANNUALY_PRICE_ID'),
+      annualyDoyles: this.configService.get<string>('STRIPE_DOYLES_ANNUALY_PRICE_ID'),
     };
 
     if (!stripeSecretKey) {
