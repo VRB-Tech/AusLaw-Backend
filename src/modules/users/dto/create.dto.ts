@@ -59,6 +59,9 @@ export class CreateUserDto {
   @IsOptional()
   phone?: string;
 
+  @IsPhoneNumber(null, { message: 'Office mobile number must be a valid phone number' })
+  officeNumber?: string;
+
   @IsUUID('4', { message: 'Firebase ID must be a valid UUID' })
   @IsOptional()
   firebaseId?: string;
