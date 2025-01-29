@@ -21,15 +21,19 @@ export class NylasController {
   constructor(private readonly nylasService: NylasService) {}
 
   @Post('grantId')
-  async exchangeToken(@Body('code') code: string) {
+  async exchangeToken(@Body('code') code: string, @Body('specialistId') specialistId: string) {
     try {
       if (!code) {
         throw new BadRequestException('Authorization code is required');
       }
 
-      const data = await this.nylasService.exchangeCodeForGrantId(code);
+      if (!specialistId) {
+        throw new BadRequestException('Account `specialistId` property is required');
+      }
 
-      return data;
+      const grantId = await this.nylasService.exchangeCodeForGrantId(code, specialistId);
+
+      return { grantId };
     } catch (error) {
       throw new Error(`Error exchanging authorization code for token: ${error.message}`);
     }

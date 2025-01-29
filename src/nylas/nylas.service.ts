@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { addMonths, startOfDay } from 'date-fns';
 import Nylas from 'nylas';
+import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class NylasService {
@@ -12,7 +13,10 @@ export class NylasService {
   private apiKey: string;
   private redirectUri: string;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private readonly userService: UsersService,
+  ) {
     this.clientId = this.configService.get<string>('NYLAS_CLIENT_ID');
     this.apiKey = this.configService.get<string>('NYLAS_API_KEY');
     this.apiUrl = this.configService.get<string>('NYLAS_API_URI');
@@ -25,28 +29,25 @@ export class NylasService {
   }
 
   public connectNylasAuthUrl(): string {
-    const scope = 'email calendar';
     const responseType = 'code';
-    const url = `https://api.nylas.com/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.redirectUri}&response_type=${responseType}&scope=${scope}`;
+    const url = `${this.apiUrl}/v3/connect/auth?client_id=${this.clientId}&redirect_uri=${this.redirectUri}&response_type=${responseType}`;
 
     return url;
   }
 
-  async exchangeCodeForGrantId(code: string): Promise<string> {
-    const body = {
-      client_id: this.clientId,
-      client_secret: this.apiKey,
-      grant_type: 'authorization_code',
-      code,
-      redirect_uri: this.redirectUri,
-    };
-
+  async exchangeCodeForGrantId(code: string, userId: string): Promise<string> {
     try {
-      const response = await axios.post(`${this.apiUrl}/v3/connect/token`, body, {
-        headers: { 'Content-Type': 'application/json' },
+      const response = await this.nylas.auth.exchangeCodeForToken({
+        clientId: this.clientId,
+        redirectUri: this.redirectUri,
+        code,
       });
 
-      return response.data;
+      const { grantId } = response;
+
+      await this.userService.update(userId, { grantId });
+
+      return grantId;
     } catch (error) {
       console.error('Error exchanging code for token:', error.response?.data || error.message);
       throw new Error('Failed to exchange authorization code for token');
