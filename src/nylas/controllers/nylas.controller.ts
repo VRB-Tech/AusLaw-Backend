@@ -35,6 +35,13 @@ export class NylasController {
     }
   }
 
+  @Get('connect')
+  redirectToNylasAuth() {
+    const authUrl = this.nylasService.connectNylasAuthUrl();
+
+    return { nylasRedirectUrl: authUrl };
+  }
+
   @Get('calendars')
   async getCalendars(@Query('grantId') grantId: string) {
     try {

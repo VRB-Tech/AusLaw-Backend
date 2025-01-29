@@ -24,6 +24,14 @@ export class NylasService {
     });
   }
 
+  public connectNylasAuthUrl(): string {
+    const scope = 'email calendar';
+    const responseType = 'code';
+    const url = `https://api.nylas.com/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.redirectUri}&response_type=${responseType}&scope=${scope}`;
+
+    return url;
+  }
+
   async exchangeCodeForGrantId(code: string): Promise<string> {
     const body = {
       client_id: this.clientId,
