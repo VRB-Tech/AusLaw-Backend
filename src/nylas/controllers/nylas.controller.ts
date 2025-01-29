@@ -85,7 +85,7 @@ export class NylasController {
     }
 
     try {
-      const result = await this.nylasService.deleteUserByGrantId(grantId);
+      const result = await this.nylasService.deleteUserFromNylasDashboardByGrantId(grantId);
 
       return result;
     } catch (error) {

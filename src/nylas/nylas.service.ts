@@ -77,12 +77,15 @@ export class NylasService {
       const now = startOfDay(new Date());
       const threeMonthsLater = addMonths(now, 12);
 
+      const start = Math.floor(now.getTime() / 1000).toString();
+      const end = Math.floor(threeMonthsLater.getTime() / 1000).toString();
+
       const events = await this.nylas.events.list({
         identifier: grantId,
         queryParams: {
           calendarId: calendarId,
-          start: now.toISOString(),
-          end: threeMonthsLater.toISOString(),
+          start,
+          end,
           limit: 200,
         },
       });
@@ -94,7 +97,7 @@ export class NylasService {
     }
   }
 
-  async deleteUserByGrantId(grantId: string): Promise<void> {
+  async deleteUserFromNylasDashboardByGrantId(grantId: string): Promise<void> {
     try {
       await axios.delete(`${this.apiUrl}/v3/grants/${grantId}`, {
         headers: {
