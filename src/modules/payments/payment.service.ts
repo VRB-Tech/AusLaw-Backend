@@ -54,7 +54,7 @@ export class PaymentService implements OnModuleInit {
             quantity: 1,
           },
         ],
-        success_url: `${this.configService.get<string>('FRONTEND_URL')}/en/profile`,
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/en/specialist-info`,
         cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/en/payment`,
       });
 
@@ -90,7 +90,7 @@ export class PaymentService implements OnModuleInit {
             quantity: 1,
           },
         ],
-        success_url: `${this.configService.get<string>('FRONTEND_URL')}/en/profile`,
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/en/specialist-info`,
         cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/en/payment`,
       });
 
@@ -129,7 +129,7 @@ export class PaymentService implements OnModuleInit {
         subscription_data: {
           trial_period_days: 14,
         },
-        success_url: `${this.configService.get<string>('FRONTEND_URL')}/en/profile`,
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/en/specialist-info`,
         cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/en/payment`,
       });
 
@@ -171,7 +171,7 @@ export class PaymentService implements OnModuleInit {
         subscription_data: {
           trial_period_days: 14,
         },
-        success_url: `${this.configService.get<string>('FRONTEND_URL')}/en/profile`,
+        success_url: `${this.configService.get<string>('FRONTEND_URL')}/en/specialist-info`,
         cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/en/payment`,
       });
 
