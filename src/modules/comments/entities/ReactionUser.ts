@@ -11,7 +11,7 @@ export class ReactionUser extends Model<ReactionUser> {
 
   @PrimaryKey
   @ForeignKey(() => User)
-  @Column(DataType.STRING)
+  @Column(DataType.UUID)
   userId: string;
 
   @Column(DataType.STRING)

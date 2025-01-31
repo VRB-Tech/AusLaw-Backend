@@ -23,7 +23,7 @@ export class Comment extends Model<Comment> {
   id: number;
 
   @ForeignKey(() => User)
-  @Column(DataType.STRING)
+  @Column(DataType.UUID)
   creatorId: string;
 
   @ForeignKey(() => Post)

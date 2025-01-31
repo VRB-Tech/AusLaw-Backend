@@ -27,7 +27,7 @@ export class Reaction extends Model<Reaction> {
   commentId: number;
 
   @ForeignKey(() => User)
-  @Column(DataType.STRING)
+  @Column(DataType.UUID)
   reactorId: string;
 
   @Column(DataType.STRING)

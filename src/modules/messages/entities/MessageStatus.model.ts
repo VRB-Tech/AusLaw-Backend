@@ -20,7 +20,7 @@ export class MessageStatus extends Model<MessageStatus> {
 
   @ForeignKey(() => User)
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     allowNull: false,
   })
   userId: string;

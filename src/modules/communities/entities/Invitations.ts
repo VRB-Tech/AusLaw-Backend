@@ -24,11 +24,11 @@ export class Invitation extends Model<Invitation> {
   communityId: number;
 
   @ForeignKey(() => User)
-  @Column(DataType.STRING)
+  @Column(DataType.UUID)
   inviterId: string;
 
   @ForeignKey(() => User)
-  @Column(DataType.STRING)
+  @Column(DataType.UUID)
   inviteeId: string;
 
   @Column({
