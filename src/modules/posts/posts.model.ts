@@ -25,7 +25,7 @@ export class Post extends Model<Post> {
   communityId: number;
 
   @ForeignKey(() => User)
-  @Column(DataType.INTEGER)
+  @Column(DataType.STRING)
   creatorId: string;
 
   @Column(DataType.TEXT)

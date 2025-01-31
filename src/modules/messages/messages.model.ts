@@ -25,7 +25,7 @@ export class Message extends Model<Message> {
 
   @ForeignKey(() => User)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING,
     onDelete: 'CASCADE',
   })
   senderId: string;
