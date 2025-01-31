@@ -1,15 +1,15 @@
 import {
-  Column,
-  Model,
-  Table,
-  PrimaryKey,
   AutoIncrement,
+  BelongsTo,
+  BelongsToMany,
+  Column,
+  CreatedAt,
   DataType,
   ForeignKey,
-  BelongsTo,
-  CreatedAt,
+  Model,
+  PrimaryKey,
+  Table,
   UpdatedAt,
-  BelongsToMany,
 } from 'sequelize-typescript';
 import { User } from 'src/modules/users/users.model';
 import { Comment } from './Comment';
@@ -28,7 +28,7 @@ export class Reaction extends Model<Reaction> {
 
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
-  reactorId: number;
+  reactorId: string;
 
   @Column(DataType.STRING)
   emoji: string;
@@ -38,7 +38,7 @@ export class Reaction extends Model<Reaction> {
     allowNull: false,
     defaultValue: [],
   })
-  reactorIds: number[];
+  reactorIds: string[];
 
   @CreatedAt
   @Column(DataType.DATE)

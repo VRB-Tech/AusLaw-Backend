@@ -1,15 +1,14 @@
 import {
-  Table,
+  AutoIncrement,
+  BelongsTo,
   Column,
+  ForeignKey,
   Model,
   PrimaryKey,
-  AutoIncrement,
-  ForeignKey,
-  BelongsTo,
+  Table,
 } from 'sequelize-typescript';
 import { User } from '../../users/users.model';
 import { Chat } from '../chats.model';
-import { Community } from 'src/modules/communities/entities/Community';
 
 @Table
 export class ChatUser extends Model<ChatUser> {
@@ -20,7 +19,7 @@ export class ChatUser extends Model<ChatUser> {
 
   @ForeignKey(() => User)
   @Column
-  userId: number;
+  userId: string;
 
   @ForeignKey(() => Chat)
   @Column

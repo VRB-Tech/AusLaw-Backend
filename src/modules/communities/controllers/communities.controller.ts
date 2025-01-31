@@ -1,22 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseInterceptors,
-  UploadedFiles,
+  Get,
+  Param,
   ParseIntPipe,
+  Patch,
+  Post,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-import { CommunityService } from '../services/communities.service';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateCommunityDto } from '../dto/create.dto';
 import { UpdateCommunityDto } from '../dto/update.dto';
-import {
-  FileFieldsInterceptor,
-  FilesInterceptor,
-} from '@nestjs/platform-express';
+import { CommunityService } from '../services/communities.service';
 
 @Controller('communities')
 export class CommunityController {
@@ -43,7 +40,7 @@ export class CommunityController {
   @Post(':id/members')
   async addUserToCommunity(
     @Param('id', ParseIntPipe) id: number,
-    @Body('userId', ParseIntPipe) userId: number,
+    @Body('userId', ParseIntPipe) userId: string,
   ) {
     return this.communityService.addUserToCommunity(id, userId);
   }
@@ -64,10 +61,7 @@ export class CommunityController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: number,
-    @Body() updateCommunityDto: UpdateCommunityDto,
-  ) {
+  update(@Param('id') id: number, @Body() updateCommunityDto: UpdateCommunityDto) {
     return this.communityService.update(id, updateCommunityDto);
   }
 

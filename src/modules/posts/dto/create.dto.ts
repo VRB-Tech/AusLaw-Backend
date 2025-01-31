@@ -1,11 +1,11 @@
-import { IsInt, IsOptional, IsString, IsArray } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
   @IsInt()
   communityId: number;
 
-  @IsInt()
-  creatorId: number;
+  @IsString()
+  creatorId: string;
 
   @IsString()
   text: string;

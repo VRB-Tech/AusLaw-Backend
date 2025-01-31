@@ -57,7 +57,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client: Socket,
     payload: {
       chatId: number;
-      userId: number;
+      userId: string;
       text: string;
       files?: string[];
     },
@@ -282,7 +282,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { commentId, userId, emoji } = payload;
 
     try {
-      const reaction = await this.reactionsService.addReaction(commentId, userId, emoji);
+      const reaction = await this.reactionsService.addReaction(commentId, userId.toString(), emoji);
 
       this.server.emit('reactionAdded', reaction);
     } catch (error) {
@@ -298,7 +298,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { commentId, userId, emoji } = payload;
 
     try {
-      const reaction = await this.reactionsService.removeReaction(commentId, userId, emoji);
+      const reaction = await this.reactionsService.removeReaction(
+        commentId,
+        userId.toString(),
+        emoji,
+      );
 
       this.server.emit('reactionRemoved', reaction);
     } catch (error) {

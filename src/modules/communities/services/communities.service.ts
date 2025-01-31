@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Community } from '../entities/Community';
-import { CreateCommunityDto } from '../dto/create.dto';
-import { UpdateCommunityDto } from '../dto/update.dto';
 import { Op } from 'sequelize';
 import { FileUploader } from 'src/middlewares/FileUploader';
 import { User } from 'src/modules/users/users.model';
+import { CreateCommunityDto } from '../dto/create.dto';
+import { UpdateCommunityDto } from '../dto/update.dto';
+import { Community } from '../entities/Community';
 
 @Injectable()
 export class CommunityService {
@@ -28,12 +28,10 @@ export class CommunityService {
         : [createCommunityDto.image];
 
       const validFilesToUpload = filesToUpload.filter(
-        (file) =>
-          typeof file === 'string' || (file as Express.Multer.File).buffer,
+        file => typeof file === 'string' || (file as Express.Multer.File).buffer,
       );
 
-      const uploadedImages =
-        await this.fileUploader.uploadFiles(validFilesToUpload);
+      const uploadedImages = await this.fileUploader.uploadFiles(validFilesToUpload);
 
       uploadedFiles.unshift(...uploadedImages);
       imageFile = uploadedFiles[0];
@@ -45,12 +43,10 @@ export class CommunityService {
         : [createCommunityDto.banner];
 
       const validFilesToUpload = filesToUpload.filter(
-        (file) =>
-          typeof file === 'string' || (file as Express.Multer.File).buffer,
+        file => typeof file === 'string' || (file as Express.Multer.File).buffer,
       );
 
-      const uploadedBanner =
-        await this.fileUploader.uploadFiles(validFilesToUpload);
+      const uploadedBanner = await this.fileUploader.uploadFiles(validFilesToUpload);
 
       uploadedFiles.push(...uploadedBanner);
       bannerFile = uploadedFiles[uploadedFiles.length - 1];
@@ -76,7 +72,7 @@ export class CommunityService {
 
     await community.$set(
       'usersInfo',
-      existingUsers.map((member) => member.id),
+      existingUsers.map(member => member.id),
     );
 
     return this.communityModel.findByPk(community.id, {
@@ -84,7 +80,7 @@ export class CommunityService {
     });
   }
 
-  async addUserToCommunity(id: number, userId: number): Promise<Community> {
+  async addUserToCommunity(id: number, userId: string): Promise<Community> {
     const community = await this.findOne(id);
 
     if (!community) {
@@ -96,10 +92,7 @@ export class CommunityService {
     if (!community.members.includes(userIdString)) {
       community.members.push(userIdString);
 
-      await this.communityModel.update(
-        { members: community.members },
-        { where: { id } },
-      );
+      await this.communityModel.update({ members: community.members }, { where: { id } });
     }
 
     const existingUsers = await this.usersModel.findAll({
@@ -108,7 +101,7 @@ export class CommunityService {
 
     await community.$set(
       'usersInfo',
-      existingUsers.map((member) => member.id),
+      existingUsers.map(member => member.id),
     );
 
     return this.communityModel.findByPk(community.id, {
@@ -165,25 +158,18 @@ export class CommunityService {
     return communities;
   }
 
-  async update(
-    id: number,
-    updateCommunityDto: UpdateCommunityDto,
-  ): Promise<Community> {
+  async update(id: number, updateCommunityDto: UpdateCommunityDto): Promise<Community> {
     const community = await this.findOne(id);
 
     if (updateCommunityDto.members || updateCommunityDto.admins) {
       let allUserIds = [];
 
       if (updateCommunityDto.members) {
-        allUserIds = [
-          ...new Set([...community.admins, ...updateCommunityDto.members]),
-        ];
+        allUserIds = [...new Set([...community.admins, ...updateCommunityDto.members])];
       }
 
       if (updateCommunityDto.admins) {
-        allUserIds = [
-          ...new Set([...community.members, ...updateCommunityDto.admins]),
-        ];
+        allUserIds = [...new Set([...community.members, ...updateCommunityDto.admins])];
       }
 
       const existingUsers = await this.usersModel.findAll({
@@ -193,7 +179,7 @@ export class CommunityService {
       await community.$set('usersInfo', []);
       await community.$set(
         'usersInfo',
-        existingUsers.map((user) => user.id),
+        existingUsers.map(user => user.id),
       );
 
       await community.reload({ include: [{ association: 'usersInfo' }] });
@@ -210,15 +196,10 @@ export class CommunityService {
     return community;
   }
 
-  async removeUserFromCommunity(
-    id: number,
-    userId: number,
-  ): Promise<Community> {
+  async removeUserFromCommunity(id: number, userId: number): Promise<Community> {
     const community = await this.findOne(id);
 
-    community.members = community.members.filter(
-      (member) => member !== userId.toString(),
-    );
+    community.members = community.members.filter(member => member !== userId.toString());
 
     await community.save();
 

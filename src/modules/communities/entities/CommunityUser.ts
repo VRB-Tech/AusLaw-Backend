@@ -1,11 +1,11 @@
 import {
-  Table,
+  AutoIncrement,
+  BelongsTo,
   Column,
+  ForeignKey,
   Model,
   PrimaryKey,
-  AutoIncrement,
-  ForeignKey,
-  BelongsTo,
+  Table,
 } from 'sequelize-typescript';
 import { User } from '../../users/users.model';
 import { Community } from './Community';
@@ -19,7 +19,7 @@ export class CommunityUser extends Model<CommunityUser> {
 
   @ForeignKey(() => User)
   @Column
-  userId: number;
+  userId: string;
 
   @ForeignKey(() => Community)
   @Column

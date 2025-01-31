@@ -7,9 +7,9 @@ import {
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
+import { Chat } from 'src/modules/chats/chats.model';
 import { User } from '../../users/users.model';
 import { Message } from '../messages.model';
-import { Chat } from 'src/modules/chats/chats.model';
 
 @Table
 export class MessageStatus extends Model<MessageStatus> {
@@ -20,10 +20,10 @@ export class MessageStatus extends Model<MessageStatus> {
 
   @ForeignKey(() => User)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING,
     allowNull: false,
   })
-  userId: number;
+  userId: string;
 
   @ForeignKey(() => Chat)
   @Column({

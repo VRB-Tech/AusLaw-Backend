@@ -1,6 +1,6 @@
-import { Table, Column, Model, ForeignKey } from 'sequelize-typescript';
-import { Post } from '../posts.model';
+import { Column, ForeignKey, Model, Table } from 'sequelize-typescript';
 import { User } from 'src/modules/users/users.model';
+import { Post } from '../posts.model';
 
 @Table
 export class PostLikes extends Model<PostLikes> {
@@ -10,5 +10,5 @@ export class PostLikes extends Model<PostLikes> {
 
   @ForeignKey(() => User)
   @Column
-  userId: number;
+  userId: string;
 }

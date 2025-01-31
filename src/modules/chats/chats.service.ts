@@ -65,14 +65,14 @@ export class ChatsService {
     return chatWithUsers;
   }
 
-  async getChatParticipants(chatId: number): Promise<number[]> {
+  async getChatParticipants(chatId: number): Promise<string[]> {
     const chat = await this.findOne(chatId);
 
     if (!chat) {
       throw new NotFoundException('Chat not found');
     }
 
-    return chat.users.map(id => Number(id));
+    return chat.users.map(id => id);
   }
 
   async findAll(): Promise<Chat[]> {

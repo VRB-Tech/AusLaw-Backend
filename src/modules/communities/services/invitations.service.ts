@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/modules/users/users.model';
-import { Invitation } from '../entities/Invitations';
 import { InviteStatus } from 'src/types/InviteStatus';
 import { Community } from '../entities/Community';
+import { Invitation } from '../entities/Invitations';
 import { CommunityService } from './communities.service';
 
 @Injectable()
@@ -58,10 +58,7 @@ export class InvitationService {
     });
   }
 
-  async updateInvitationStatus(
-    id: number,
-    status: InviteStatus,
-  ): Promise<Invitation | null> {
+  async updateInvitationStatus(id: number, status: InviteStatus): Promise<Invitation | null> {
     const invitation = await this.invitationModel.findByPk(id);
 
     if (!invitation) {
@@ -72,10 +69,7 @@ export class InvitationService {
     await invitation.save();
 
     if (status === 'accepted') {
-      await this.communityService.addUserToCommunity(
-        invitation.communityId,
-        invitation.inviteeId,
-      );
+      await this.communityService.addUserToCommunity(invitation.communityId, invitation.inviteeId);
     }
 
     return invitation;

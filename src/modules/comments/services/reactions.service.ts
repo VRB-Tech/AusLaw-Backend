@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Reaction } from '../entities/Reaction';
-import { Comment } from '../entities/Comment';
 import { User } from 'src/modules/users/users.model';
+import { Comment } from '../entities/Comment';
+import { Reaction } from '../entities/Reaction';
 
 @Injectable()
 export class ReactionsService {
@@ -11,11 +11,7 @@ export class ReactionsService {
     @InjectModel(Comment) private readonly commentModel: typeof Comment,
     @InjectModel(User) private readonly userModel: typeof User,
   ) {}
-  async addReaction(
-    commentId: number,
-    userId: number,
-    emoji: string,
-  ): Promise<Reaction> {
+  async addReaction(commentId: number, userId: string, emoji: string): Promise<Reaction> {
     const comment = await this.commentModel.findByPk(commentId);
 
     if (!comment) {
@@ -64,11 +60,7 @@ export class ReactionsService {
     });
   }
 
-  async removeReaction(
-    commentId: number,
-    reactorId: number,
-    emoji: string,
-  ): Promise<Reaction> {
+  async removeReaction(commentId: number, reactorId: string, emoji: string): Promise<Reaction> {
     const reaction = await this.reactionModel.findOne({
       where: { commentId, emoji },
     });
@@ -77,11 +69,9 @@ export class ReactionsService {
       throw new NotFoundException('Reaction not found');
     }
 
-    reaction.reactorIds = reaction.reactorIds.filter((id) => id !== reactorId);
+    reaction.reactorIds = reaction.reactorIds.filter(id => id !== reactorId);
 
-    reaction.reactorIds.length === 0
-      ? await reaction.destroy()
-      : await reaction.save();
+    reaction.reactorIds.length === 0 ? await reaction.destroy() : await reaction.save();
 
     const users = await this.userModel.findAll({
       where: { id: reaction.reactorIds },

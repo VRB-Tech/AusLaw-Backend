@@ -1,5 +1,4 @@
-import { IsInt, IsOptional, IsString, IsArray } from 'class-validator';
-import { User } from 'src/modules/users/users.model';
+import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class UpdatePostDto {
   @IsOptional()
@@ -7,8 +6,8 @@ export class UpdatePostDto {
   communityId?: number;
 
   @IsOptional()
-  @IsInt()
-  creatorId?: number;
+  @IsString()
+  creatorId?: string;
 
   @IsOptional()
   @IsString()

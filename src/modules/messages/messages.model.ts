@@ -1,18 +1,16 @@
 import {
-  Column,
-  Model,
-  Table,
-  PrimaryKey,
   AutoIncrement,
+  BelongsTo,
+  Column,
   DataType,
   ForeignKey,
-  BelongsTo,
-  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
 } from 'sequelize-typescript';
-import { User } from '../users/users.model';
 import { Chat } from 'src/modules/chats/chats.model';
-import { MessageStatus } from './entities/MessageStatus.model';
 import { MessageStatusType } from 'src/types/MessageStatus';
+import { User } from '../users/users.model';
 
 @Table
 export class Message extends Model<Message> {
@@ -30,7 +28,7 @@ export class Message extends Model<Message> {
     type: DataType.INTEGER,
     onDelete: 'CASCADE',
   })
-  senderId: number;
+  senderId: string;
 
   @Column(DataType.STRING)
   content: string;

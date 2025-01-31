@@ -1,8 +1,8 @@
-import { IsString, IsOptional, IsArray, IsInt } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreateCommentDto {
   @IsInt()
-  creatorId: number;
+  creatorId: string;
 
   @IsInt()
   postId: number;

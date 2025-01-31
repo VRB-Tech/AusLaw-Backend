@@ -26,8 +26,8 @@ export class CommunityAdminService {
 
   async inviteUsersToCommunity(
     communityId: number,
-    inviterId: number,
-    inviteeIds: number[],
+    inviterId: string,
+    inviteeIds: string[],
   ): Promise<Invitation[]> {
     const community = await this.communityModel.findByPk(communityId);
 

@@ -1,13 +1,13 @@
 import {
-  Column,
-  Model,
-  Table,
-  PrimaryKey,
   AutoIncrement,
-  DataType,
-  HasMany,
-  Default,
   BelongsToMany,
+  Column,
+  DataType,
+  Default,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
 } from 'sequelize-typescript';
 import { ChatUser } from 'src/modules/chats/entities/ChatUser.model';
 import { ChatType } from 'src/types/ChatType';

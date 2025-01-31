@@ -1,16 +1,16 @@
 import {
-  Column,
-  Model,
-  Table,
-  PrimaryKey,
   AutoIncrement,
-  ForeignKey,
   BelongsTo,
+  Column,
   DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
 } from 'sequelize-typescript';
-import { Community } from './Community';
 import { User } from 'src/modules/users/users.model';
 import { InviteStatus } from 'src/types/InviteStatus';
+import { Community } from './Community';
 
 @Table
 export class Invitation extends Model<Invitation> {
@@ -24,12 +24,12 @@ export class Invitation extends Model<Invitation> {
   communityId: number;
 
   @ForeignKey(() => User)
-  @Column(DataType.INTEGER)
-  inviterId: number;
+  @Column(DataType.STRING)
+  inviterId: string;
 
   @ForeignKey(() => User)
-  @Column(DataType.INTEGER)
-  inviteeId: number;
+  @Column(DataType.STRING)
+  inviteeId: string;
 
   @Column({
     type: DataType.ENUM('pending', 'accepted', 'declined'),

@@ -1,18 +1,18 @@
 import {
-  Column,
-  Model,
-  Table,
-  PrimaryKey,
   AutoIncrement,
+  BelongsTo,
+  Column,
+  CreatedAt,
   DataType,
   ForeignKey,
-  BelongsTo,
-  UpdatedAt,
-  CreatedAt,
   HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt,
 } from 'sequelize-typescript';
-import { User } from '../../users/users.model';
 import { Post } from '../../posts/posts.model';
+import { User } from '../../users/users.model';
 import { Reaction } from './Reaction';
 
 @Table
@@ -24,7 +24,7 @@ export class Comment extends Model<Comment> {
 
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
-  creatorId: number;
+  creatorId: string;
 
   @ForeignKey(() => Post)
   @Column(DataType.INTEGER)

@@ -1,17 +1,17 @@
 import {
-  Column,
-  Model,
-  Table,
-  PrimaryKey,
   AutoIncrement,
+  BelongsTo,
+  Column,
   DataType,
   ForeignKey,
-  BelongsTo,
   HasMany,
+  Model,
+  PrimaryKey,
+  Table,
 } from 'sequelize-typescript';
-import { User } from '../users/users.model';
-import { Community } from '../communities/entities/Community';
 import { Comment } from '../comments/entities/Comment';
+import { Community } from '../communities/entities/Community';
+import { User } from '../users/users.model';
 
 @Table
 export class Post extends Model<Post> {
@@ -26,7 +26,7 @@ export class Post extends Model<Post> {
 
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
-  creatorId: number;
+  creatorId: string;
 
   @Column(DataType.TEXT)
   text: string;

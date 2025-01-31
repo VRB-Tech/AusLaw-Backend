@@ -1,11 +1,4 @@
-import {
-  Column,
-  Model,
-  Table,
-  ForeignKey,
-  PrimaryKey,
-  DataType,
-} from 'sequelize-typescript';
+import { Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { User } from 'src/modules/users/users.model';
 import { Reaction } from './Reaction';
 
@@ -19,7 +12,7 @@ export class ReactionUser extends Model<ReactionUser> {
   @PrimaryKey
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
-  userId: number;
+  userId: string;
 
   @Column(DataType.STRING)
   emoji: string;

@@ -1,18 +1,12 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsInt,
-  IsOptional,
-  IsArray,
-} from 'class-validator';
+import { IsArray, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { MessageStatusType } from 'src/types/MessageStatus';
 
 export class CreateMessageDto {
   @IsInt()
   chatId: number;
 
-  @IsInt()
-  senderId: number;
+  @IsString()
+  senderId: string;
 
   @IsString()
   @IsNotEmpty()

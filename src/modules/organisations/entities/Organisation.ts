@@ -1,11 +1,10 @@
 import { Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript';
-import { v4 as uuidv4 } from 'uuid';
 @Table
 export class Organisation extends Model<Organisation> {
   @PrimaryKey
   @Column({
     type: DataType.UUID,
-    defaultValue: uuidv4,
+    defaultValue: DataType.UUIDV4,
   })
   id: string;
 

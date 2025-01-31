@@ -1,13 +1,6 @@
-import {
-  Controller,
-  Post,
-  Delete,
-  Param,
-  Body,
-  NotFoundException,
-} from '@nestjs/common';
-import { ReactionsService } from '../services/reactions.service';
+import { Body, Controller, Delete, NotFoundException, Param, Post } from '@nestjs/common';
 import { Reaction } from '../entities/Reaction';
+import { ReactionsService } from '../services/reactions.service';
 
 @Controller('reactions')
 export class ReactionsController {
@@ -16,7 +9,7 @@ export class ReactionsController {
   @Post('add/:commentId')
   async addReaction(
     @Param('commentId') commentId: string,
-    @Body('userId') userId: number,
+    @Body('userId') userId: string,
     @Body('emoji') emoji: string,
   ): Promise<Reaction> {
     if (!userId || !emoji) {
@@ -29,7 +22,7 @@ export class ReactionsController {
   @Delete('remove/:commentId')
   async removeReaction(
     @Param('commentId') commentId: string,
-    @Body('userId') userId: number,
+    @Body('userId') userId: string,
     @Body('emoji') emoji: string,
   ): Promise<Reaction> {
     if (!userId || !commentId) {
