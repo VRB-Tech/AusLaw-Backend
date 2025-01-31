@@ -1,6 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
 import {
-  AutoIncrement,
   BelongsToMany,
   Column,
   DataType,
@@ -12,18 +11,20 @@ import {
 import { ChatUser } from 'src/modules/chats/entities/ChatUser.model';
 import { PaymentStatus } from 'src/types/PaymentStatus';
 import { UserRole } from 'src/types/UserRole';
+import { v4 as uuidv4 } from 'uuid';
 import { Chat } from '../chats/chats.model';
 import { Reaction } from '../comments/entities/Reaction';
 import { ReactionUser } from '../comments/entities/ReactionUser';
 import { Community } from '../communities/entities/Community';
 import { CommunityUser } from '../communities/entities/CommunityUser';
-
 @Table
 export class User extends Model<User> {
   @PrimaryKey
-  @AutoIncrement
-  @Column(DataType.INTEGER)
-  id: number;
+  @Column({
+    type: DataType.UUID,
+    defaultValue: uuidv4,
+  })
+  id: string;
 
   @Column({
     type: DataType.STRING,

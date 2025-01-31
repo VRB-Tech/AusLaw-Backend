@@ -107,7 +107,7 @@ export class PaymentController {
   }
 
   @Post('cancel/user/:userId')
-  async cancelSubscriptionForUser(@Param('userId') userId: number) {
+  async cancelSubscriptionForUser(@Param('userId') userId: string) {
     try {
       await this.paymentService.cancelSubscription(userId);
 
@@ -118,7 +118,7 @@ export class PaymentController {
   }
 
   @Post('cancel/organisation/:organisationId')
-  async cancelSubscriptionForOrganisation(@Param('organisationId') organisationId: number) {
+  async cancelSubscriptionForOrganisation(@Param('organisationId') organisationId: string) {
     try {
       await this.paymentService.cancelSubscriptionForOrganisation(organisationId);
 

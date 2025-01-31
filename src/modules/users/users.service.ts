@@ -39,7 +39,7 @@ export class UsersService {
     return this.userModel.findAll();
   }
 
-  async findById(id: number): Promise<User> {
+  async findById(id: string): Promise<User> {
     const user = await this.userModel.findByPk(id);
 
     if (!user) {
@@ -127,11 +127,11 @@ export class UsersService {
     return user.update(updateUserDto);
   }
 
-  async updatePaymentStatus(userId: number, paymentStatus: PaymentStatus): Promise<void> {
+  async updatePaymentStatus(userId: string, paymentStatus: PaymentStatus): Promise<void> {
     await this.userModel.update({ paymentStatus }, { where: { id: userId } });
   }
 
-  async updatePassword(userId: number, newPassword: string): Promise<string> {
+  async updatePassword(userId: string, newPassword: string): Promise<string> {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await this.userModel.update({ password: hashedPassword }, { where: { id: userId } });
 
@@ -139,7 +139,7 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    const user = await this.findById(+id);
+    const user = await this.findById(id);
 
     if (!user) {
       throw new NotFoundException(`User with ID: '${id}' not found`);
@@ -149,7 +149,7 @@ export class UsersService {
     return { message: `User with ID ${id} was removed successfully.` };
   }
 
-  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<string> {
+  async updateRefreshToken(userId: string, refreshToken: string | null): Promise<string> {
     const hashedToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
     await this.userModel.update({ refreshToken: hashedToken }, { where: { id: userId } });
 

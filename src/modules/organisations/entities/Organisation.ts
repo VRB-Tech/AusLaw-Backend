@@ -1,20 +1,13 @@
-import {
-  AutoIncrement,
-  Column,
-  DataType,
-  Default,
-  Model,
-  PrimaryKey,
-  Table,
-  Unique,
-} from 'sequelize-typescript';
-
+import { Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript';
+import { v4 as uuidv4 } from 'uuid';
 @Table
 export class Organisation extends Model<Organisation> {
   @PrimaryKey
-  @AutoIncrement
-  @Column(DataType.INTEGER)
-  id: number;
+  @Column({
+    type: DataType.UUID,
+    defaultValue: uuidv4,
+  })
+  id: string;
 
   @Column({
     type: DataType.STRING,

@@ -15,7 +15,7 @@ export class OrganisationsService {
     return this.organisationModel.findOne({ where: { email } });
   }
 
-  async findById(id: number): Promise<Organisation | null> {
+  async findById(id: string): Promise<Organisation | null> {
     return this.organisationModel.findByPk(id);
   }
 
@@ -31,7 +31,7 @@ export class OrganisationsService {
     });
   }
 
-  async updatePaymentStatus(organisationId: number, paymentStatus: string): Promise<void> {
+  async updatePaymentStatus(organisationId: string, paymentStatus: string): Promise<void> {
     await this.organisationModel.update({ paymentStatus }, { where: { id: organisationId } });
   }
 
@@ -51,13 +51,13 @@ export class OrganisationsService {
     return organisation.update(updateOrganisationDto);
   }
 
-  async updateRefreshToken(id: number, refreshToken: string | null): Promise<void> {
+  async updateRefreshToken(id: string, refreshToken: string | null): Promise<void> {
     const hashedRefreshToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
 
     await this.organisationModel.update({ refreshToken: hashedRefreshToken }, { where: { id } });
   }
 
-  async updatePassword(orgId: number, newPassword: string): Promise<string> {
+  async updatePassword(orgId: string, newPassword: string): Promise<string> {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await this.organisationModel.update({ password: hashedPassword }, { where: { id: orgId } });
 

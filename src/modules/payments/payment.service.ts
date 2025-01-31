@@ -213,7 +213,7 @@ export class PaymentService implements OnModuleInit {
     }
   }
 
-  async cancelSubscription(userId: number): Promise<void> {
+  async cancelSubscription(userId: string): Promise<void> {
     try {
       const user = await this.userService.findById(userId);
 
@@ -235,7 +235,7 @@ export class PaymentService implements OnModuleInit {
     }
   }
 
-  async cancelSubscriptionForOrganisation(organisationId: number): Promise<void> {
+  async cancelSubscriptionForOrganisation(organisationId: string): Promise<void> {
     try {
       const organisation = await this.organisationService.findById(organisationId);
 

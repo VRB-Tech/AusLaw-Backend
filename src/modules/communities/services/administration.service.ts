@@ -1,16 +1,16 @@
 import {
+  ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  ForbiddenException,
-  ConflictException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Invitation } from '../entities/Invitations';
-import { User } from 'src/modules/users/users.model';
-import { Community } from '../entities/Community';
-import { UsersService } from 'src/modules/users/users.service';
-import { CommunityUser } from '../entities/CommunityUser';
 import { Op } from 'sequelize';
+import { User } from 'src/modules/users/users.model';
+import { UsersService } from 'src/modules/users/users.service';
+import { Community } from '../entities/Community';
+import { CommunityUser } from '../entities/CommunityUser';
+import { Invitation } from '../entities/Invitations';
 
 @Injectable()
 export class CommunityAdminService {
@@ -50,11 +50,9 @@ export class CommunityAdminService {
     if (
       !Array.isArray(community.admins) ||
       (!community.admins.includes(inviterId.toString()) &&
-        !owners.some((owner) => owner.id === inviterId))
+        !owners.some(owner => owner.id === inviterId.toString()))
     ) {
-      throw new ForbiddenException(
-        `Only community admins can send invitations`,
-      );
+      throw new ForbiddenException(`Only community admins can send invitations`);
     }
 
     const invitations: Invitation[] = [];
@@ -117,7 +115,7 @@ export class CommunityAdminService {
         admins.push(userIdStr);
       }
     } else {
-      admins = admins.filter((adminId) => adminId !== userIdStr);
+      admins = admins.filter(adminId => adminId !== userIdStr);
     }
 
     await community.update({
@@ -128,10 +126,7 @@ export class CommunityAdminService {
     return community;
   }
 
-  async removeUserFromCommunity(
-    communityId: number,
-    userId: number,
-  ): Promise<{ message: string }> {
+  async removeUserFromCommunity(communityId: number, userId: number): Promise<{ message: string }> {
     const community = await this.communityModel.findByPk(communityId, {
       include: [
         {
@@ -150,25 +145,15 @@ export class CommunityAdminService {
     }
 
     if (
-      !community.members.some(
-        (memberId) => memberId.toString() === userId.toString(),
-      ) &&
-      !community.admins.some(
-        (adminId) => adminId.toString() === userId.toString(),
-      )
+      !community.members.some(memberId => memberId.toString() === userId.toString()) &&
+      !community.admins.some(adminId => adminId.toString() === userId.toString())
     ) {
-      throw new NotFoundException(
-        `User with ID ${userId} not found in community ${communityId}`,
-      );
+      throw new NotFoundException(`User with ID ${userId} not found in community ${communityId}`);
     }
 
-    const members = community.members.filter(
-      (memberId) => memberId !== userId.toString(),
-    );
+    const members = community.members.filter(memberId => memberId !== userId.toString());
 
-    const admins = community.admins.filter(
-      (adminId) => adminId !== userId.toString(),
-    );
+    const admins = community.admins.filter(adminId => adminId !== userId.toString());
 
     const communityUser = await CommunityUser.findOne({
       where: {

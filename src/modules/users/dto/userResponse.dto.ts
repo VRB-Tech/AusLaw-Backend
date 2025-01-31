@@ -1,9 +1,9 @@
-import { IsEmail, IsNumber, IsString } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 import { UserRole } from 'src/types/UserRole';
 
 export class UserResponseDto {
-  @IsNumber()
-  id: number;
+  @IsString()
+  id: string;
 
   @IsString()
   firstName: string;
