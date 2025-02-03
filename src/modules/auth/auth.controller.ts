@@ -109,7 +109,7 @@ export class AuthController {
     return { message: 'Password has been reset successfully.' };
   }
 
-  @Post('reset-password/:email')
+  @Post('change-password/:email')
   @HttpCode(HttpStatus.OK)
   async resetPasswordByAdmin(
     @Param('email') email: string,
