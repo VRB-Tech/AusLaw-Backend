@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Query,
   Req,
@@ -26,26 +28,6 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
   ) {}
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
-  async googleAuth() {}
-
-  @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req) {
-    const user = req.user;
-
-    const payload = { email: user.email, subject: user.id };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '14d' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '30d' });
-
-    return {
-      accessToken,
-      refreshToken,
-      user,
-    };
-  }
-
   @Post('register/user')
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
@@ -106,6 +88,10 @@ export class AuthController {
   @Post('request-password-reset')
   @HttpCode(HttpStatus.OK)
   async requestPasswordReset(@Body() { email }: { email: string }) {
+    if (!email) {
+      throw new BadRequestException('Email is required.');
+    }
+
     await this.authService.requestPasswordReset(email);
 
     return { message: 'Password reset link sent successfully' };
@@ -114,8 +100,47 @@ export class AuthController {
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Query('token') token: string, @Body('newPassword') newPassword: string) {
+    if (!token || !newPassword) {
+      throw new BadRequestException('Token and password are required.');
+    }
+
     await this.authService.resetPassword(token, newPassword);
 
-    return { message: 'Password has been reset successfully' };
+    return { message: 'Password has been reset successfully.' };
+  }
+
+  @Post('reset-password/:email')
+  @HttpCode(HttpStatus.OK)
+  async resetPasswordByAdmin(
+    @Param('email') email: string,
+    @Body('oldPassword') oldPassword: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    if (!oldPassword || !newPassword) {
+      throw new BadRequestException('Old and new passwords are required.');
+    }
+
+    await this.authService.updatePasswordByEmail(email, oldPassword, newPassword);
+
+    return { message: 'Password has been updated successfully.' };
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {}
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req) {
+    const user = req.user;
+
+    const payload = { email: user.email, subject: user.id };
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '14d' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '30d' });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

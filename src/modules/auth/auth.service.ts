@@ -234,23 +234,42 @@ export class AuthService {
     try {
       const decoded = this.jwtService.verify(resetToken);
 
-      const { subject, email } = decoded;
+      const { email } = decoded;
 
-      const user = await this.usersService.findById(subject.id);
-      const organisation = await this.organisationsService.findById(subject.id);
-
-      const account = user || organisation;
+      const account = await this.findAccountByEmail(email);
 
       if (!account || account.email !== email) {
         throw new UnauthorizedException('Invalid or expired reset token.');
       }
 
-      user
+      account.hasOwnProperty('role')
         ? await this.usersService.updatePassword(account.id, newPassword)
         : await this.organisationsService.updatePassword(account.id, newPassword);
-    } catch (err) {
+    } catch (error) {
       throw new UnauthorizedException('Invalid or expired reset token.');
     }
+  }
+
+  async updatePasswordByEmail(
+    email: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const account = await this.findAccountByEmail(email);
+
+    if (!account) {
+      throw new NotFoundException('Account with certain email does not exist.');
+    }
+
+    if (!(await bcrypt.compare(oldPassword, account.password))) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
+    console.log(account.hasOwnProperty('role'));
+
+    'role' in account
+      ? await this.usersService.updatePassword(account.id, newPassword)
+      : await this.organisationsService.updatePassword(account.id, newPassword);
   }
 
   async logoutAccount(email: string): Promise<void> {
