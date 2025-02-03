@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
 import { CreateOrganisationDto } from './dto/create.dto';
+import { UpdateOrganisationDto } from './dto/update.dto';
 import { Organisation } from './entities/Organisation';
 
 @Injectable()
@@ -37,7 +38,7 @@ export class OrganisationsService {
 
   async update(
     id: string,
-    updateOrganisationDto: Partial<CreateOrganisationDto>,
+    updateOrganisationDto: Partial<UpdateOrganisationDto>,
   ): Promise<Organisation> {
     const organisation = await this.organisationModel.findByPk(id);
 

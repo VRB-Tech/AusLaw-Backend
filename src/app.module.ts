@@ -17,6 +17,7 @@ import { Invitation } from './modules/communities/entities/Invitations';
 import { MessageStatus } from './modules/messages/entities/MessageStatus.model';
 import { Message } from './modules/messages/messages.model';
 import { MessagesModule } from './modules/messages/messages.module';
+import { Organisation } from './modules/organisations/entities/Organisation';
 import { OrganisationsModule } from './modules/organisations/organisations.module';
 import { PaymentModule } from './modules/payments/payment.module';
 import { Post } from './modules/posts/posts.model';
@@ -53,6 +54,7 @@ import { NylasModule } from './nylas/nylas.module';
           ReactionUser,
           Comment,
           Post,
+          Organisation,
         ],
         dialectOptions: {
           ssl: {
@@ -74,6 +76,7 @@ import { NylasModule } from './nylas/nylas.module';
       ReactionUser,
       Comment,
       Post,
+      Organisation,
     ]),
     AuthModule,
     UsersModule,

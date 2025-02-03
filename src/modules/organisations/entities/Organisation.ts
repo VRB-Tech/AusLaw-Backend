@@ -1,4 +1,14 @@
-import { Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript';
+import {
+  Column,
+  DataType,
+  HasMany,
+  IsUrl,
+  Model,
+  PrimaryKey,
+  Table,
+  Unique,
+} from 'sequelize-typescript';
+import { User } from 'src/modules/users/users.model';
 @Table
 export class Organisation extends Model<Organisation> {
   @PrimaryKey
@@ -13,13 +23,6 @@ export class Organisation extends Model<Organisation> {
     allowNull: false,
   })
   name: string;
-
-  @Default(false)
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-  })
-  isDoyles: boolean;
 
   @Unique
   @Column({
@@ -39,6 +42,28 @@ export class Organisation extends Model<Organisation> {
 
   @Column(DataType.STRING)
   refreshToken?: string;
+
+  @IsUrl
+  @Column(DataType.STRING)
+  photo: string;
+
+  @Column(DataType.STRING)
+  officeAddress: string;
+
+  @Column(DataType.STRING)
+  phone: string;
+
+  @Column(DataType.STRING)
+  officeNumber: string;
+
+  @Column(DataType.STRING)
+  country: string;
+
+  @Column(DataType.STRING)
+  state: string;
+
+  @Column(DataType.STRING)
+  city: string;
 
   @Column({
     type: DataType.STRING,
@@ -63,4 +88,7 @@ export class Organisation extends Model<Organisation> {
     allowNull: true,
   })
   subscriptionId: string;
+
+  @HasMany(() => User)
+  members: User[];
 }

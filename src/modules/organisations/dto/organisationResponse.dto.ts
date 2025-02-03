@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 
 export class OrganisationResponseDto {
   @IsString()
@@ -9,9 +9,6 @@ export class OrganisationResponseDto {
 
   @IsEmail()
   email: string;
-
-  @IsBoolean()
-  isDoyles: boolean;
 
   @IsString()
   paymentLink?: string;

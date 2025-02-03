@@ -1,8 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
 import {
+  BelongsTo,
   BelongsToMany,
   Column,
   DataType,
+  ForeignKey,
   HasMany,
   Model,
   PrimaryKey,
@@ -16,6 +18,7 @@ import { Reaction } from '../comments/entities/Reaction';
 import { ReactionUser } from '../comments/entities/ReactionUser';
 import { Community } from '../communities/entities/Community';
 import { CommunityUser } from '../communities/entities/CommunityUser';
+import { Organisation } from '../organisations/entities/Organisation';
 @Table
 export class User extends Model<User> {
   @PrimaryKey
@@ -166,6 +169,13 @@ export class User extends Model<User> {
 
   @Column(DataType.ARRAY(DataType.STRING))
   specialisations: string[];
+
+  @ForeignKey(() => Organisation)
+  @Column({ type: DataType.UUID })
+  organisationId: string;
+
+  @BelongsTo(() => Organisation)
+  organisation: Organisation;
 
   @HasMany(() => ChatUser)
   chatUsers: ChatUser[];

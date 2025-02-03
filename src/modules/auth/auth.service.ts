@@ -131,7 +131,6 @@ export class AuthService {
         id: newOrganisation.id,
         email: newOrganisation.email,
         name: newOrganisation.name,
-        isDoyles: newOrganisation.isDoyles,
       };
     } catch (err) {
       throw new UnauthorizedException('Invalid or expired registration token');
