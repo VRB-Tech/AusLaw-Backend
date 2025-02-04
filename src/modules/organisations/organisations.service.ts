@@ -27,9 +27,12 @@ export class OrganisationsService {
   async create(createOrganisationDto: CreateOrganisationDto): Promise<Organisation> {
     const { name, email, password } = createOrganisationDto;
 
-    const account = (await this.findByEmail(email)) || this.userService.findByEmail(email);
+    const [organisationAccount, userAccount] = await Promise.all([
+      this.findByEmail(email),
+      this.userService.findByEmail(email),
+    ]);
 
-    if (account) {
+    if (organisationAccount || userAccount) {
       throw new ConflictException('Account already exists');
     }
 
