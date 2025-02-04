@@ -17,6 +17,7 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/modules/auth/strategies/jwt/jwt-auth.guard';
+import { UpdateUserDto } from '../dto/update.dto';
 import { CreateUserDto } from './../dto/create.dto';
 import { User } from './../users.model';
 import { UsersService } from './../users.service';
@@ -61,7 +62,7 @@ export class UsersController {
   @UseInterceptors(FilesInterceptor('photo', 1))
   async update(
     @Param('id') id: string,
-    @Body() updateUserDto: Partial<CreateUserDto>,
+    @Body() updateUserDto: UpdateUserDto,
     @UploadedFiles() photo: Express.Multer.File[],
   ) {
     if (photo && photo.length > 0) {

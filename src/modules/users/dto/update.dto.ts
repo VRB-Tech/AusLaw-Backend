@@ -15,28 +15,32 @@ import {
 import { PaymentStatus } from 'src/types/PaymentStatus';
 import { UserRole } from 'src/types/UserRole';
 
-export class CreateUserDto {
+export class UpdateUserDto {
   @IsString()
+  @IsOptional()
   @IsNotEmpty({ message: 'First name is required' })
   @Matches(/^[a-zA-Z\s]+$/, { message: 'First name must only contain letters and spaces' })
-  firstName: string;
+  firstName?: string;
 
   @IsString()
+  @IsOptional()
   @IsNotEmpty({ message: 'Last name is required' })
   @Matches(/^[a-zA-Z\s]+$/, { message: 'Last name must only contain letters and spaces' })
-  lastName: string;
+  lastName?: string;
 
   @IsEmail({}, { message: 'Email must be a valid email address' })
+  @IsOptional()
   @IsNotEmpty({ message: 'Email is required' })
-  email: string;
+  email?: string;
 
   @IsString()
+  @IsOptional()
   @IsNotEmpty({ message: 'Password is required' })
   @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
     message:
       'Password must contain at least 8 characters, including letters, numbers, and special characters',
   })
-  password: string;
+  password?: string;
 
   @IsString()
   @IsOptional()
@@ -59,6 +63,7 @@ export class CreateUserDto {
   @IsOptional()
   phone?: string;
 
+  @IsOptional()
   @IsPhoneNumber(null, { message: 'Office mobile number must be a valid phone number' })
   officeNumber?: string;
 
@@ -86,8 +91,9 @@ export class CreateUserDto {
   @IsOptional()
   timezone?: string;
 
+  @IsOptional()
   @IsIn(['user'], { message: 'Role must be a valid UserRole' })
-  role: UserRole = 'user';
+  role?: UserRole = 'user';
 
   @IsString()
   @IsOptional()

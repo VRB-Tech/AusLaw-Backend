@@ -264,8 +264,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
 
-    console.log(account.hasOwnProperty('role'));
-
     'role' in account
       ? await this.usersService.updatePassword(account.id, newPassword)
       : await this.organisationsService.updatePassword(account.id, newPassword);

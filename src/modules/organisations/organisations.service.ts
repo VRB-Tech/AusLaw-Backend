@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
+import { FileUploader } from 'src/middlewares/FileUploader';
 import { CreateOrganisationDto } from './dto/create.dto';
 import { UpdateOrganisationDto } from './dto/update.dto';
 import { Organisation } from './entities/Organisation';
@@ -10,6 +11,7 @@ export class OrganisationsService {
   constructor(
     @InjectModel(Organisation)
     private readonly organisationModel: typeof Organisation,
+    private readonly fileUploader: FileUploader,
   ) {}
 
   async findByEmail(email: string): Promise<Organisation | null> {
@@ -17,7 +19,7 @@ export class OrganisationsService {
   }
 
   async findById(id: string): Promise<Organisation | null> {
-    return this.organisationModel.findByPk(id);
+    return await this.organisationModel.findByPk(id);
   }
 
   async create(createOrganisationDto: CreateOrganisationDto): Promise<Organisation> {
@@ -41,6 +43,28 @@ export class OrganisationsService {
     updateOrganisationDto: Partial<UpdateOrganisationDto>,
   ): Promise<Organisation> {
     const organisation = await this.organisationModel.findByPk(id);
+
+    if (!organisation) {
+      throw new NotFoundException(`Organisation with ID: '${id}' not found`);
+    }
+
+    let uploadedFiles: string[] = [];
+
+    if (updateOrganisationDto.photo) {
+      const filesToUpload = Array.isArray(updateOrganisationDto.photo)
+        ? updateOrganisationDto.photo
+        : [updateOrganisationDto.photo];
+
+      const validFilesToUpload = filesToUpload.filter(
+        file => typeof file === 'string' || (file as Express.Multer.File).buffer,
+      );
+
+      uploadedFiles = await this.fileUploader.uploadFiles(validFilesToUpload);
+
+      if (uploadedFiles.length > 0) {
+        updateOrganisationDto.photo = uploadedFiles[0];
+      }
+    }
 
     if (updateOrganisationDto.password) {
       updateOrganisationDto.password = await this.updatePassword(

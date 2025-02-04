@@ -44,8 +44,13 @@ export class Organisation extends Model<Organisation> {
   refreshToken?: string;
 
   @IsUrl
-  @Column(DataType.STRING)
-  photo: string;
+  @Column({
+    type: DataType.STRING,
+    validate: {
+      isUrl: true,
+    },
+  })
+  photo: Express.Multer.File | string;
 
   @Column(DataType.STRING)
   officeAddress: string;
@@ -88,6 +93,15 @@ export class Organisation extends Model<Organisation> {
     allowNull: true,
   })
   subscriptionId: string;
+
+  @Column(DataType.ARRAY(DataType.STRING))
+  locations: string[];
+
+  @Column(DataType.ARRAY(DataType.STRING))
+  services: string[];
+
+  @Column(DataType.ARRAY(DataType.STRING))
+  specialisations: string[];
 
   @HasMany(() => User)
   members: User[];

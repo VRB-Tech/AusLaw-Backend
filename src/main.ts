@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -11,12 +12,21 @@ async function main() {
     rawBody: true,
   });
 
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: false,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      skipMissingProperties: false,
+    }),
+  );
+
   const sequelize = app.get(Sequelize);
   const configService = app.get(ConfigService);
   const port = configService.get<string>('PORT');
 
-  app.useWebSocketAdapter(new IoAdapter(app));
   app.enableCors();
+  app.useWebSocketAdapter(new IoAdapter(app));
   app.use('/payments/webhook', express.raw({ type: 'application/json' }));
 
   await sequelize.sync({ alter: true });

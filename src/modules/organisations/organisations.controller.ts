@@ -4,17 +4,23 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
-  Put,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from '../auth/strategies/jwt/jwt-auth.guard';
 import { CreateOrganisationDto } from './dto/create.dto';
 import { UpdateOrganisationDto } from './dto/update.dto';
 import { Organisation } from './entities/Organisation';
 import { OrganisationsService } from './organisations.service';
 
 @Controller('organisations')
+@UseGuards(JwtAuthGuard)
 export class OrganisationsController {
   constructor(private readonly organisationsService: OrganisationsService) {}
 
@@ -30,13 +36,15 @@ export class OrganisationsController {
     }
   }
 
-  @Get(':email')
+  @Get('email/:email')
   @HttpCode(HttpStatus.OK)
   async findByEmail(@Param('email') email: string): Promise<Organisation> {
     const organisation = await this.organisationsService.findByEmail(email);
+
     if (!organisation) {
-      throw new Error('Organisation not found');
+      throw new NotFoundException('Organisation not found');
     }
+
     return organisation;
   }
 
@@ -44,59 +52,28 @@ export class OrganisationsController {
   @HttpCode(HttpStatus.OK)
   async findById(@Param('id') id: string): Promise<Organisation> {
     const organisation = await this.organisationsService.findById(id);
+
     if (!organisation) {
-      throw new Error('Organisation not found');
+      throw new NotFoundException('Organisation not found');
     }
+
     return organisation;
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FilesInterceptor('photo', 1))
   async update(
     @Param('id') id: string,
     @Body() updateOrganisationDto: UpdateOrganisationDto,
+    @UploadedFiles() photo: Express.Multer.File[],
   ): Promise<Organisation> {
-    const organisation = await this.organisationsService.findById(id);
-    if (!organisation) {
-      throw new Error('Organisation not found');
+    if (photo && photo.length > 0) {
+      updateOrganisationDto.photo = photo[0];
     }
+
     const updatedOrganisation = await this.organisationsService.update(id, updateOrganisationDto);
+
     return updatedOrganisation;
-  }
-
-  @Put(':id/payment-status')
-  @HttpCode(HttpStatus.OK)
-  async updatePaymentStatus(
-    @Param('id') id: string,
-    @Body() body: { paymentStatus: string },
-  ): Promise<void> {
-    const organisation = await this.organisationsService.findById(id);
-    if (!organisation) {
-      throw new Error('Organisation not found');
-    }
-    await this.organisationsService.updatePaymentStatus(id, body.paymentStatus);
-  }
-
-  @Put(':id/refresh-token')
-  @HttpCode(HttpStatus.OK)
-  async updateRefreshToken(
-    @Param('id') id: string,
-    @Body() body: { refreshToken: string },
-  ): Promise<void> {
-    const organisation = await this.organisationsService.findById(id);
-    if (!organisation) {
-      throw new Error('Organisation not found');
-    }
-    await this.organisationsService.updateRefreshToken(id, body.refreshToken);
-  }
-
-  @Put(':id/password')
-  @HttpCode(HttpStatus.OK)
-  async updatePassword(@Param('id') id: string, @Body() body: { password: string }): Promise<void> {
-    const organisation = await this.organisationsService.findById(id);
-    if (!organisation) {
-      throw new Error('Organisation not found');
-    }
-    await this.organisationsService.updatePassword(id, body.password);
   }
 }

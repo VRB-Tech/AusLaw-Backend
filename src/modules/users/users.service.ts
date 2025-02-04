@@ -5,6 +5,7 @@ import { Op, WhereOptions } from 'sequelize';
 import { FileUploader } from 'src/middlewares/FileUploader';
 import { PaymentStatus } from 'src/types/PaymentStatus';
 import { CreateUserDto } from './dto/create.dto';
+import { UpdateUserDto } from './dto/update.dto';
 import { User } from './users.model';
 
 @Injectable()
@@ -95,7 +96,7 @@ export class UsersService {
     });
   }
 
-  async update(id: string, updateUserDto: Partial<CreateUserDto>): Promise<User> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.userModel.findByPk(id);
 
     if (!user) {
@@ -124,7 +125,7 @@ export class UsersService {
       updateUserDto.password = await this.updatePassword(user.id, updateUserDto.password);
     }
 
-    return user.update(updateUserDto);
+    return await user.update(updateUserDto);
   }
 
   async updatePaymentStatus(userId: string, paymentStatus: PaymentStatus): Promise<void> {
