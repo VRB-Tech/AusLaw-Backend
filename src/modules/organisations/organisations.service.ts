@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
 import { FileUploader } from 'src/middlewares/FileUploader';
+import { UsersService } from '../users/users.service';
 import { CreateOrganisationDto } from './dto/create.dto';
 import { UpdateOrganisationDto } from './dto/update.dto';
 import { Organisation } from './entities/Organisation';
@@ -12,6 +13,7 @@ export class OrganisationsService {
     @InjectModel(Organisation)
     private readonly organisationModel: typeof Organisation,
     private readonly fileUploader: FileUploader,
+    private readonly userService: UsersService,
   ) {}
 
   async findByEmail(email: string): Promise<Organisation | null> {
@@ -24,6 +26,12 @@ export class OrganisationsService {
 
   async create(createOrganisationDto: CreateOrganisationDto): Promise<Organisation> {
     const { name, email, password } = createOrganisationDto;
+
+    const account = (await this.findByEmail(email)) || this.userService.findByEmail(email);
+
+    if (account) {
+      throw new ConflictException('Account already exists');
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
