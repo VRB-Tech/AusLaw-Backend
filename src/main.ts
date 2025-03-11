@@ -21,6 +21,13 @@ async function main() {
     }),
   );
 
+  app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+  });
+
   const sequelize = app.get(Sequelize);
   const configService = app.get(ConfigService);
   const port = configService.get<string>('PORT');
